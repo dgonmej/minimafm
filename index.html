@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+	<!-- URL for relative links -->
+	<base href="https://dgonmej.github.io/minimafm/">
+
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="description" content="MinimaFM 97.9, retransmitiendo desde el Valle de Güímar en Tenerife.">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="author" content="Diego González">
+	<meta name="keywords" content="profile">
+
+	<!-- Page title -->
+	<title>MínimaFM | La voz del valle</title>
+
+	<!-- Favicons -->
+	<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+	<link rel="manifest" href="/site.webmanifest">
+	
+	<!-- Custom styles -->
+	<link rel="stylesheet" href="css/styles.css">
+	
+	<!-- External fonts -->
+	<link href="https://fonts.googleapis.com/css?family=Montserrat|Montserrat+Alternates&display=swap" rel="stylesheet">
+	
+	<!-- Tailwind CSS -->
+	<link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+
+	<!-- Font Awesome if you need it -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
+</head>
+
+<body class="font-sans antialiased leading-normal tracking-wider text-gray-900">
+
+	<!-- Main section -->
+	<section id="section-main" class="bg-cover bg-center pb-1 lg:pb-0 transition duration-500 ease-in-out">
+		<div class="flex items-center flex-wrap max-w-full lg:max-w-4xl h-auto lg:h-screen mx-auto mb-20 lg:mb-0">
+			
+			<!-- Image for mobile view -->
+			<div id="profile-mobile" class="transition duration-500 ease-in-out profile bg-image bg-cover bg-center bg-no-repeat bg-blue-700 lg:hidden relative z-10 rounded-lg shadow-lg w-48 h-48 mx-auto"></div>
+
+			<div class="box-theme w-full lg:w-3/5 rounded lg:rounded-r-none shadow-lg bg-white mx-4 lg:mx-0">
+				<div class="p-6 text-center lg:text-left">
+
+					<!-- Name -->
+					<h1 class="text-3xl font-primary font-bold pt-32 lg:pt-0">
+						MínimaFM 97.9
+					</h1>
+
+					<div class="w-4/5 lg:w-full border-b-2 border-blue-500 mx-auto lg:mx-0 pt-2"></div>
+
+					<!-- Location -->
+					<p class="flex items-center justify-center lg:justify-start text-base text-gray-600 pt-2">
+						La voz del valle, tu voz.
+					</p>
+
+					<!-- Description -->
+					<p class="text-base pt-6">
+						Retransmitiendo desde el Valle de Güímar en Tenerife.
+					</p>
+
+					<!-- Audio Player -->
+					<div class="flex flex-wrap justify-center items-center bg-gray-600 rounded-lg mt-4 py-4">
+						<span class="w-100 block text-white font-bold text-lg px-4 sm:pr-6 mb-4 sm:mb-0 lg:mb-4"></i> Escúchanos en directo </span>
+						<audio aautoplay controls src=""></audio>
+						<!-- <audio aautoplay controls src="https://stream-176.zeno.fm/fjmbxsddqv1uv"></audio> -->
+					</div>
+				</div>
+			</div>
+
+			<!-- Big profile image for side bar (desktop) -->
+			<div class="profile w-full lg:w-2/5 bg-blue-700 rounded-lg transition duration-500 ease-in-out">
+				<img id="profile-desktop" src="images/logos/logo-minimafm_old.png" class="rounded-none lg:rounded-lg shadow-lg hidden lg:block">
+			</div>
+
+			<!-- Pin to top right corner -->
+			<div class="absolute top-0 right-0 h-12 w-18 p-4">
+				<button class="tooltip-left js-change-theme focus:outline-none bg-blue-900 text-blue-500 rounded-full py-2 px-3" data-tippy-content="Cambiar modo">
+					<i class="fas fa-moon"></i>
+				</button>
+			</div>
+
+			<!-- Wallpaper author -->
+			<div id="author-reference-1" class="hidden lg:block absolute bottom-0 right-0 pr-2">
+				<p class="opacity-50 text-white text-xs p-2">
+					Imagen de <a class="hover:text-blue-400" href="https://unsplash.com/es/@kelmoquete?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplas" target="_blank" rel="noopener noreferrer">Kelvin Moquete</a> en Unsplash
+				</p>
+			</div>
+
+			<!-- Wallpaper author -->
+			<div id="author-reference-2" class="hidden absolute bottom-0 right-0 pr-2">
+				<p class="opacity-50 text-white text-xs p-2">
+					Imagen de <a class="hover:text-blue-400" href="https://unsplash.com/es/@actionvance?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash" target="_blank" rel="noopener noreferrer">ActionVance</a> en Unsplash
+				</p>
+			</div>
+
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<footer class="bg-gray-900 border-t-2 border-blue-600 text-center mx-auto p-4">
+
+		<!-- Version -->
+		<div class="hidden lg:inline-block float-left bg-blue-700 rounded text-xs text-gray-100 mb-2 px-2 py-1">
+			v1.0.1
+		</div>
+
+		<p class="font-normal text-gray-100">
+			Desarrollado por <span class="font-bold text-blue-600">Diego González</span>
+		</p>
+	</footer>
+
+	<script src="https://unpkg.com/popper.js@1/dist/umd/popper.min.js"></script>
+	<script src="https://unpkg.com/tippy.js@4"></script>
+
+	<script src="js/tooltip.js"></script>
+	<script src="js/mode-selector.js"></script>
+
+</body>
+
+</html>
