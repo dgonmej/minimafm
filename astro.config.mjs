@@ -13,10 +13,4 @@ export default defineConfig({
   trailingSlash: 'always',
   devToolbar: { enabled: false },
   security: { checkOrigin: true },
-  vite: {
-    server: {
-      // Solo en desarrollo: permitir abrir el servidor local a traves de un tunel de Cloudflare
-      allowedHosts: ['.trycloudflare.com'],
-    },
-  },
 });
