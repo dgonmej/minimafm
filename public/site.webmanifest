@@ -1,0 +1,12 @@
+{
+  "name": "Mínima FM 97.9",
+  "short_name": "Mínima FM",
+  "start_url": "/minimafm/",
+  "display": "standalone",
+  "background_color": "#f7f5f2",
+  "theme_color": "#c2410c",
+  "icons": [
+    { "src": "/minimafm/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/minimafm/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -1,0 +1,224 @@
+---
+import { Image } from 'astro:assets';
+import logoFull from '../assets/logo-full.png';
+import Icon from './Icon.astro';
+import { radio } from '../data/radio';
+
+const base = import.meta.env.BASE_URL;
+const year = new Date().getFullYear();
+const tel = (n: string) => n.replace(/\s/g, '');
+---
+
+<footer class="footer">
+  <div class="sunset" aria-hidden="true"></div>
+  <div class="container grid">
+    <div class="about">
+      <div class="logo-plate">
+        <Image src={logoFull} alt={`${radio.nombre} ${radio.frecuencia}, ${radio.lema}`} width={220} />
+      </div>
+      <p>{radio.descripcion}</p>
+    </div>
+
+    <nav aria-label="Secciones del pie">
+      <h2>La radio</h2>
+      <ul>
+        <li><a href={`${base}programas/`}>Programas</a></li>
+        <li><a href={`${base}horarios/`}>Horarios</a></li>
+        <li><a href={`${base}eventos/`}>Agenda de eventos</a></li>
+        <li><a href={`${base}noticias/`}>Noticias</a></li>
+        <li><a href={`${base}la-radio/`}>Quiénes somos</a></li>
+        <li><a href={`${base}anunciate/`}>Anúnciate</a></li>
+      </ul>
+    </nav>
+
+    <div>
+      <h2>Contacto</h2>
+      <ul class="contact">
+        <li><Icon name="phone" size={16} /><a href={`tel:${tel(radio.telefono)}`}>{radio.telefono}</a></li>
+        <li><Icon name="message-circle" size={16} /><a href={`https://wa.me/34${tel(radio.whatsapp)}`} rel="noopener noreferrer">WhatsApp {radio.whatsapp}</a></li>
+        <li><Icon name="mail" size={16} /><a href={`mailto:${radio.correo}`}>{radio.correo}</a></li>
+        <li><Icon name="map-pin" size={16} /><span>{radio.direccion}</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container appearance">
+    <span>Apariencia</span>
+    <dgonmej-ui-theme-toggle compact></dgonmej-ui-theme-toggle>
+  </div>
+
+  <div class="container bottom">
+    <div class="legal">
+      <p>© {year} {radio.nombre} {radio.frecuencia}. {radio.zona}.</p>
+      <nav aria-label="Información legal">
+        <a href={`${base}legal/aviso-legal/`}>Aviso legal</a>
+        <a href={`${base}legal/privacidad/`}>Privacidad</a>
+        <a href={`${base}legal/cookies/`}>Cookies</a>
+      </nav>
+    </div>
+    <p class="socials">
+      <a href={radio.redes[0].url} rel="noopener noreferrer" aria-label="Facebook"><Icon name="facebook" /></a>
+      <a href={radio.redes[1].url} rel="noopener noreferrer" aria-label="Instagram"><Icon name="instagram" /></a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: calc(var(--ui-space-8) * 2);
+    background: var(--ui-color-surface);
+    box-shadow: inset 0 1px 0 var(--ui-color-separator);
+  }
+
+  /* Franja con el degradado del logo */
+  .sunset {
+    height: 4px;
+    background: var(--brand-sunset);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--ui-space-8);
+    padding-block: calc(var(--ui-space-8) * 1.5) var(--ui-space-8);
+  }
+
+  @media (min-width: 760px) {
+    .grid {
+      grid-template-columns: 1.4fr 1fr 1.4fr;
+    }
+  }
+
+  .logo-plate {
+    display: inline-block;
+    padding: var(--ui-space-3) var(--ui-space-4);
+    border-radius: var(--ui-radius-md);
+    background: #fffdfb;
+    box-shadow: inset 0 0 0 1px rgb(80 60 45 / 0.1);
+  }
+
+  .logo-plate :global(img) {
+    width: 200px;
+    height: auto;
+  }
+
+  .about p {
+    max-width: 30em;
+    margin: var(--ui-space-4) 0 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  h2 {
+    margin: 0 0 var(--ui-space-3);
+    font-size: var(--ui-font-size-body);
+    font-weight: 700;
+  }
+
+  ul {
+    display: grid;
+    gap: var(--ui-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li a {
+    color: var(--ui-color-text);
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    li a:hover {
+      color: var(--ui-color-primary-text);
+      text-decoration: underline;
+    }
+  }
+
+  .contact li {
+    display: grid;
+    grid-template-columns: 16px 1fr;
+    gap: var(--ui-space-2);
+    align-items: start;
+    color: var(--ui-color-text-muted);
+  }
+
+  .contact :global(.icon) {
+    margin-top: 4px;
+    color: var(--ui-color-primary-text);
+  }
+
+  /* Selector de tema en el pie: solo en moviles muy estrechos, donde no cabe en la barra */
+  .appearance {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ui-space-3);
+    padding-block: var(--ui-space-4);
+    border-top: 1px solid var(--ui-color-separator);
+    font-weight: 600;
+  }
+
+  @media (max-width: 359px) {
+    .appearance {
+      display: flex;
+    }
+  }
+
+  .bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ui-space-3);
+    /* Abajo, hueco para el reproductor fijo: asi no tapa el pie y el fondo del pie llega al final */
+    padding-block: var(--ui-space-5) calc(var(--ui-space-5) + 88px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--ui-color-separator);
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+  }
+
+  .bottom p {
+    margin: 0;
+  }
+
+  .legal {
+    display: grid;
+    gap: var(--ui-space-1);
+  }
+
+  .legal nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--ui-space-4);
+  }
+
+  .legal a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    color: var(--ui-color-text-muted);
+    text-decoration: underline;
+    text-decoration-color: var(--ui-color-separator);
+    text-underline-offset: 3px;
+  }
+
+  @media (hover: hover) {
+    .legal a:hover {
+      color: var(--ui-color-text);
+    }
+  }
+
+  .socials {
+    display: flex;
+    gap: var(--ui-space-2);
+  }
+
+  .socials a {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--ui-radius-control);
+    color: var(--ui-color-text);
+    background: var(--ui-color-fill);
+  }
+</style>

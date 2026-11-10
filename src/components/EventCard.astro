@@ -1,0 +1,113 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { iconoEvento, partesFecha, formatoFechaLarga, iso } from '../lib/format';
+
+interface Props {
+  evento: CollectionEntry<'eventos'>;
+}
+
+const { evento } = Astro.props;
+const { titulo, fecha, hora, lugar, categoria, resumen } = evento.data;
+const { dia, mes } = partesFecha(fecha);
+const href = `${import.meta.env.BASE_URL}eventos/${evento.id}/`;
+---
+
+<dgonmej-ui-card class="event" href={href} interactive>
+  <div slot="header" class="head">
+    <time class="date" datetime={iso(fecha)} aria-label={formatoFechaLarga(fecha)}>
+      <span class="day">{dia}</span>
+      <span class="month">{mes}</span>
+    </time>
+    <span class="category">
+      <Icon name={iconoEvento[categoria]} size={16} />
+      {categoria}
+    </span>
+  </div>
+  <h3>{titulo}</h3>
+  <p class="text">{resumen}</p>
+  <ul slot="footer" class="meta">
+    <li><Icon name="clock" size={16} />{hora}</li>
+    <li><Icon name="map-pin" size={16} />{lugar}</li>
+  </ul>
+</dgonmej-ui-card>
+
+<style>
+  .event {
+    height: 100%;
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ui-space-3);
+    width: 100%;
+  }
+
+  /* Bloque de fecha en "mango", como una hoja de calendario */
+  .date {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    padding: 6px 0;
+    border-radius: var(--ui-radius-md);
+    color: var(--brand-mango-ink);
+    background: var(--brand-mango);
+    line-height: 1;
+  }
+
+  .day {
+    font-size: var(--ui-font-size-title2);
+    font-weight: 700;
+  }
+
+  .month {
+    margin-top: 2px;
+    font-size: var(--ui-font-size-caption);
+    font-weight: 700;
+    text-transform: lowercase;
+  }
+
+  .category {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ui-color-primary-text);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 600;
+  }
+
+  h3 {
+    margin: 0 0 var(--ui-space-2);
+    font-size: var(--ui-font-size-title3);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .text {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .meta {
+    display: grid;
+    gap: var(--ui-space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 600;
+  }
+
+  .meta li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .meta :global(.icon) {
+    flex: none;
+    color: var(--ui-color-text-muted);
+  }
+</style>

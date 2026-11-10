@@ -1,0 +1,318 @@
+---
+import { Image } from 'astro:assets';
+import logoFull from '../assets/logo-full.png';
+import Icon from './Icon.astro';
+import { radio } from '../data/radio';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container inner">
+    <div class="intro">
+      <div class="logo-plate">
+        <Image src={logoFull} alt={`${radio.nombre} ${radio.frecuencia}, ${radio.lema}`} width={360} loading="eager" />
+      </div>
+      <h1 id="hero-title">La radio del Valle de Güímar</h1>
+      <p class="lead">Música, información local y las voces de nuestros vecinos, las 24 horas del día.</p>
+      <div class="actions">
+        <dgonmej-ui-button id="listen" variant="primary" size="large">
+          <dgonmej-ui-icon name="play" size="20"></dgonmej-ui-icon>
+          <span class="listen-label">Escuchar en directo</span>
+        </dgonmej-ui-button>
+        <dgonmej-ui-button variant="glass" size="large" href={`${base}horarios/`}>
+          <Icon name="calendar-days" />Ver la parrilla
+        </dgonmej-ui-button>
+      </div>
+    </div>
+
+    <!-- Lo que suena ahora (se calcula en el navegador, en hora canaria) -->
+    <article class="on-air" aria-labelledby="on-air-title" aria-live="polite">
+      <div class="on-air-head">
+        <span class="live-dot" aria-hidden="true"></span>
+        <h2 id="on-air-title">Ahora en antena</h2>
+        <span class="frequency">{radio.frecuencia} FM</span>
+      </div>
+      <p class="program" data-now-name>Música continua</p>
+      <p class="host" data-now-host>{radio.nombre}</p>
+      <div class="progress" data-now-progress hidden>
+        <dgonmej-ui-progress size="thin" tone="danger" label="Tiempo emitido"></dgonmej-ui-progress>
+        <span class="range" data-now-range></span>
+      </div>
+      <p class="next">
+        <span class="next-label">A continuación</span>
+        <span data-next>Consulta la parrilla</span>
+      </p>
+    </article>
+  </div>
+</section>
+
+<script>
+  import { enAntena } from '../lib/schedule';
+  import { dias } from '../data/radio';
+
+  const minutos = (h: string) => {
+    const [hh, mm] = h.split(':').map(Number);
+    return hh * 60 + mm;
+  };
+
+  const setup = () => {
+    const name = document.querySelector('[data-now-name]');
+    if (!name) return;
+    const host = document.querySelector('[data-now-host]')!;
+    const progressBox = document.querySelector<HTMLElement>('[data-now-progress]')!;
+    const progress = progressBox.querySelector('dgonmej-ui-progress') as HTMLElement & { value: number };
+    const range = document.querySelector('[data-now-range]')!;
+    const next = document.querySelector('[data-next]')!;
+
+    const update = () => {
+      const { actual, siguiente, dia, continuidad } = enAntena();
+      if (actual) {
+        name.textContent = actual.programa.nombre;
+        host.textContent = `Con ${actual.programa.presentador}`;
+        const ahora = new Intl.DateTimeFormat('en-GB', { timeZone: 'Atlantic/Canary', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
+        const total = minutos(actual.fin) - minutos(actual.inicio);
+        progress.value = Math.round(((minutos(ahora) - minutos(actual.inicio)) / total) * 100);
+        range.textContent = `De ${actual.inicio} a ${actual.fin}`;
+        progressBox.hidden = false;
+      } else {
+        name.textContent = continuidad.nombre;
+        host.textContent = continuidad.descripcion;
+        progressBox.hidden = true;
+      }
+      if (siguiente) {
+        const cuando = siguiente.dia === dia ? `a las ${siguiente.inicio}` : `el ${dias[siguiente.dia].toLowerCase()} a las ${siguiente.inicio}`;
+        next.textContent = `${siguiente.programa.nombre}, ${cuando}`;
+      }
+    };
+    update();
+    const timer = setInterval(update, 60_000);
+    document.addEventListener('astro:before-swap', () => clearInterval(timer), { once: true });
+
+    // "Escuchar en directo" controla el reproductor fijo de abajo
+    const listen = document.getElementById('listen')!;
+    const label = listen.querySelector('.listen-label')!;
+    const icon = listen.querySelector('dgonmej-ui-icon')!;
+    const player = document.getElementById('player') as HTMLElement & { toggle: () => void; hasAttribute: (n: string) => boolean };
+    const sync = () => {
+      const playing = player.hasAttribute('playing');
+      label.textContent = playing ? 'Pausar la radio' : 'Escuchar en directo';
+      icon.setAttribute('name', playing ? 'pause' : 'play');
+    };
+    listen.addEventListener('ui-click', () => player.toggle());
+    player.addEventListener('ui-play', sync);
+    player.addEventListener('ui-pause', sync);
+    document.addEventListener('astro:before-swap', () => {
+      player.removeEventListener('ui-play', sync);
+      player.removeEventListener('ui-pause', sync);
+    }, { once: true });
+    sync();
+  };
+
+  document.addEventListener('astro:page-load', setup);
+</script>
+
+<style>
+  /* Fondo de atardecer con los colores del logo */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: calc(var(--ui-space-8) * 1.5) calc(var(--ui-space-8) * 2);
+    background:
+      radial-gradient(60% 70% at 15% 10%, rgb(245 166 35 / 0.55), transparent 70%),
+      radial-gradient(55% 65% at 85% 20%, rgb(228 87 46 / 0.5), transparent 70%),
+      radial-gradient(70% 80% at 60% 110%, rgb(163 36 91 / 0.45), transparent 70%),
+      radial-gradient(50% 60% at 0% 100%, rgb(61 46 134 / 0.4), transparent 70%),
+      var(--ui-color-background);
+  }
+
+  .inner {
+    display: grid;
+    gap: var(--ui-space-8);
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .inner {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    }
+  }
+
+  .logo-plate {
+    display: inline-block;
+    padding: var(--ui-space-3) var(--ui-space-5);
+    border-radius: var(--ui-radius-lg);
+    background: #fffdfb;
+    box-shadow: var(--ui-shadow-md);
+  }
+
+  .logo-plate :global(img) {
+    width: min(300px, 64vw);
+    height: auto;
+  }
+
+  h1 {
+    margin: var(--ui-space-6) 0 0;
+    font-family: var(--ui-font-family-display);
+    font-size: clamp(2.25rem, 5.5vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+
+  .lead {
+    max-width: 30em;
+    margin: var(--ui-space-4) 0 var(--ui-space-6);
+    color: var(--ui-color-text);
+    font-size: var(--ui-font-size-title3);
+    line-height: 1.45;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-space-3);
+  }
+
+  /* Tarjeta de vidrio "Ahora en antena" */
+  .on-air {
+    padding: var(--ui-space-6);
+    border-radius: var(--ui-radius-lg);
+    color: var(--ui-material-text);
+    background: var(--ui-material-bg);
+    border: 1px solid var(--ui-material-border);
+    box-shadow: var(--ui-shadow-lg);
+  }
+
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    .on-air {
+      background: var(--ui-material-bg-translucent);
+      -webkit-backdrop-filter: var(--ui-material-blur);
+      backdrop-filter: var(--ui-material-blur);
+    }
+  }
+
+  .on-air-head {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-2);
+  }
+
+  .on-air-head h2 {
+    margin: 0;
+    flex: 1;
+    font-size: var(--ui-font-size-subhead);
+    font-weight: 700;
+  }
+
+  .live-dot {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--site-live);
+  }
+
+  /* Anillo que late (solo transform y opacity) */
+  .live-dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--site-live);
+    opacity: 0.35;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .live-dot::after {
+      animation: pulse 2s var(--ui-ease-standard) infinite;
+    }
+    @keyframes pulse {
+      to {
+        opacity: 0;
+        transform: scale(2.6);
+      }
+    }
+  }
+
+  /* El bocadillo verde del 97.9, como en el logo */
+  .frequency {
+    padding: 4px 12px;
+    border-radius: 999px 999px 999px 4px;
+    color: #fff;
+    background: #3f7d20;
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 700;
+  }
+
+  .program {
+    margin: var(--ui-space-5) 0 0;
+    font-family: var(--ui-font-family-display);
+    font-size: var(--ui-font-size-title1);
+    font-weight: 700;
+    letter-spacing: var(--ui-letter-spacing-tight);
+    line-height: 1.15;
+  }
+
+  .host {
+    margin: var(--ui-space-1) 0 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .progress {
+    display: grid;
+    gap: var(--ui-space-2);
+    margin-top: var(--ui-space-4);
+  }
+
+  .progress[hidden] {
+    display: none;
+  }
+
+  .range {
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .next {
+    display: grid;
+    gap: 2px;
+    margin: var(--ui-space-5) 0 0;
+    padding-top: var(--ui-space-4);
+    border-top: 1px solid var(--ui-color-separator);
+    font-weight: 600;
+  }
+
+  .next-label {
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 400;
+  }
+
+  /* Entrada escalonada: el unico momento orquestado de la portada */
+  @media (prefers-reduced-motion: no-preference) {
+    .intro > *,
+    .on-air {
+      animation: reveal var(--ui-duration-slow) var(--ui-ease-standard) both;
+    }
+    .intro > :nth-child(2) {
+      animation-delay: 60ms;
+    }
+    .intro > :nth-child(3) {
+      animation-delay: 100ms;
+    }
+    .intro > :nth-child(4) {
+      animation-delay: 140ms;
+    }
+    .on-air {
+      animation-delay: 200ms;
+    }
+    @keyframes reveal {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+    }
+  }
+</style>

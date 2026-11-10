@@ -1,0 +1,103 @@
+---
+import Icon from './Icon.astro';
+import { describirFranja, iconoPrograma } from '../lib/format';
+import type { Programa } from '../data/radio';
+
+interface Props {
+  programa: Programa;
+}
+
+const { programa } = Astro.props;
+---
+
+<dgonmej-ui-card class="program" id={programa.id}>
+  <div slot="header" class="host">
+    <dgonmej-ui-avatar size="sm" name={programa.presentador}></dgonmej-ui-avatar>
+    <span>{programa.presentador}</span>
+  </div>
+  <p class="category">
+    <Icon name={iconoPrograma[programa.categoria]} size={16} />
+    {programa.categoria}
+  </p>
+  <h3><a href={`${import.meta.env.BASE_URL}programas/${programa.id}/`}>{programa.nombre}</a></h3>
+  <p class="text">{programa.descripcion}</p>
+  <ul slot="footer" class="slots">
+    {
+      programa.franjas.map((f) => (
+        <li>
+          <Icon name="clock" size={16} />
+          {describirFranja(f)}
+        </li>
+      ))
+    }
+  </ul>
+</dgonmej-ui-card>
+
+<style>
+  .program {
+    height: 100%;
+  }
+
+  .host {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ui-space-2);
+    font-size: var(--ui-font-size-subhead);
+  }
+
+  .category {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    color: var(--ui-color-primary-text);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 600;
+  }
+
+  h3 {
+    margin: var(--ui-space-1) 0 var(--ui-space-2);
+    font-size: var(--ui-font-size-title3);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    h3 a:hover {
+      color: var(--ui-color-primary-text);
+      text-decoration: underline;
+    }
+  }
+
+  .text {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .slots {
+    display: grid;
+    gap: var(--ui-space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--ui-color-text);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 600;
+  }
+
+  .slots li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .slots :global(.icon) {
+    flex: none;
+    color: var(--brand-platanera);
+  }
+</style>

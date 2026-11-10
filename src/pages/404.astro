@@ -1,0 +1,63 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Unplugged from '../components/illustrations/Unplugged.astro';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="Página no encontrada">
+  <div class="container error fill">
+    <div class="art">
+      <Unplugged />
+    </div>
+    <div class="text">
+      <p class="code">Error 404</p>
+      <h1 class="page-title">Aquí se ha desenchufado algo</h1>
+      <p class="page-intro">Puede que el enlace esté mal o que la página ya no exista. La radio, en cambio, sigue sonando.</p>
+      <div class="actions">
+        <dgonmej-ui-button variant="primary" href={base}>Volver al inicio</dgonmej-ui-button>
+        <dgonmej-ui-button variant="secondary" href={`${base}horarios/`}>Ver la parrilla</dgonmej-ui-button>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .error {
+    display: grid;
+    gap: var(--ui-space-6);
+    align-items: center;
+    padding-block: calc(var(--ui-space-8) * 1.5);
+  }
+
+  /* Dos columnas en escritorio y en pantallas apaisadas (movil en horizontal) */
+  @media (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
+    .error {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: calc(var(--ui-space-8) * 1.5);
+    }
+  }
+
+  .art {
+    max-width: 560px;
+  }
+
+  .text {
+    display: grid;
+    justify-items: start;
+    gap: var(--ui-space-4);
+  }
+
+  .code {
+    margin: 0;
+    color: var(--ui-color-primary-text);
+    font-weight: 700;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-space-3);
+    margin-top: var(--ui-space-2);
+  }
+</style>

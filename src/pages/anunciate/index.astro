@@ -1,0 +1,616 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import { radio } from '../../data/radio';
+
+const base = import.meta.env.BASE_URL;
+const tel = (n: string) => n.replace(/\s/g, '');
+
+// DATOS DE PRUEBA: tarifas ficticias, sin IGIC
+const franjas = [
+  { nombre: 'Despertador', horario: 'De lunes a viernes, de 07:00 a 10:00', precio20: 12, precio30: 15, destacada: true },
+  { nombre: 'Mañana', horario: 'De lunes a viernes, de 10:00 a 14:00', precio20: 9, precio30: 11 },
+  { nombre: 'Tarde', horario: 'De lunes a viernes, de 14:00 a 20:00', precio20: 7, precio30: 9 },
+  { nombre: 'Noche y fin de semana', horario: 'De 20:00 a 07:00, sábados y domingos', precio20: 5, precio30: 6 },
+];
+
+const formatos = [
+  {
+    icono: 'shopping-basket',
+    nombre: 'Comercio del barrio',
+    precio: '290 €',
+    unidad: 'al mes',
+    texto: '60 cuñas de 20 segundos al mes, repartidas entre la mañana y la tarde. Ideal para tiendas, bares y talleres.',
+  },
+  {
+    icono: 'mic',
+    nombre: 'Patrocinio de programa',
+    precio: 'Desde 150 €',
+    unidad: 'al mes',
+    texto: 'Tu marca presenta un programa: mención al principio y al final de cada emisión y una cuña diaria.',
+  },
+  {
+    icono: 'message-circle',
+    nombre: 'Mención en directo',
+    precio: '20 €',
+    unidad: 'cada una',
+    texto: 'El presentador habla de tu negocio o tu oferta con sus propias palabras, en mitad del programa.',
+  },
+  {
+    icono: 'party-popper',
+    nombre: 'Cobertura de evento',
+    precio: '90 €',
+    unidad: 'por evento',
+    texto: 'Cuñas la semana antes, entrevista en antena y el evento destacado en la agenda de la web.',
+  },
+] as const;
+
+const pasos = [
+  { titulo: 'Nos cuentas tu idea', texto: 'Qué quieres anunciar, a quién y en qué fechas.' },
+  { titulo: 'Grabamos la cuña', texto: 'Escribimos el guion contigo y lo grabamos en el estudio. Gratis con campañas de un mes o más.' },
+  { titulo: 'Suena en el Valle', texto: 'Programamos las cuñas en las franjas elegidas y te mandamos el plan de emisión.' },
+];
+
+const opciones = [
+  { value: 'Cuñas sueltas', label: 'Cuñas sueltas' },
+  { value: 'Comercio del barrio', label: 'Comercio del barrio' },
+  { value: 'Patrocinio de programa', label: 'Patrocinio de programa' },
+  { value: 'Mención en directo', label: 'Mención en directo' },
+  { value: 'Cobertura de evento', label: 'Cobertura de evento' },
+  { value: 'Todavía no lo sé', label: 'Todavía no lo sé' },
+];
+---
+
+<Layout title="Anúnciate" description="Tarifas de publicidad en Mínima FM: cuñas, patrocinios y menciones en directo para negocios del Valle de Güímar.">
+  <header class="container head">
+    <p class="eyebrow">Publicidad</p>
+    <h1>Que todo el Valle oiga hablar de tu negocio.</h1>
+    <p class="intro">
+      Cuñas, patrocinios y menciones en directo a precios pensados para el comercio local. Te ayudamos a escribir y grabar
+      el anuncio.
+    </p>
+    <div class="head-actions">
+      <dgonmej-ui-button variant="primary" href="#contacto">Pedir presupuesto</dgonmej-ui-button>
+      <dgonmej-ui-button variant="secondary" href={`tel:${tel(radio.telefono)}`}>
+        <Icon name="phone" size={18} />Llamar al {radio.telefono}
+      </dgonmej-ui-button>
+    </div>
+  </header>
+
+  <!-- Tarifario por franjas, como el de una emisora -->
+  <section class="container rates" aria-labelledby="tarifas">
+    <div class="rates-head">
+      <h2 id="tarifas" class="title">Tarifas por cuña</h2>
+      <p>Precio de cada pase según la franja. Sin IGIC.</p>
+    </div>
+    <div class="rate-card">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Franja</th>
+            <th scope="col" class="num">20 segundos</th>
+            <th scope="col" class="num">30 segundos</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            franjas.map((f) => (
+              <tr class:list={{ top: f.destacada }}>
+                <th scope="row">
+                  <span class="franja">
+                    {f.nombre}
+                    {f.destacada && (
+                      <dgonmej-ui-badge variant="accent" size="small">
+                        La más escuchada
+                      </dgonmej-ui-badge>
+                    )}
+                  </span>
+                  <span class="horario">{f.horario}</span>
+                </th>
+                <td class="num">{f.precio20} €</td>
+                <td class="num">{f.precio30} €</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+      <p class="note">
+        <Icon name="clock" size={16} />Campañas de más de 100 cuñas: 15 % de descuento.
+      </p>
+    </div>
+  </section>
+
+  <!-- Otros formatos -->
+  <section class="container formats-section" aria-labelledby="formatos">
+    <h2 id="formatos" class="title">Otros formatos</h2>
+    <ul class="formats">
+      {
+        formatos.map((f) => (
+          <li>
+            <span class="format-icon" aria-hidden="true">
+              <Icon name={f.icono} size={22} />
+            </span>
+            <div>
+              <h3>{f.nombre}</h3>
+              <p>{f.texto}</p>
+            </div>
+            <p class="price">
+              <strong>{f.precio}</strong>
+              <span>{f.unidad}</span>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- Como funciona -->
+  <section class="steps-section" aria-labelledby="pasos">
+    <div class="container">
+      <h2 id="pasos" class="title">Cómo funciona</h2>
+      <ol class="steps">
+        {
+          pasos.map((p, i) => (
+            <li>
+              <span class="step-num" aria-hidden="true">{i + 1}</span>
+              <h3>{p.titulo}</h3>
+              <p>{p.texto}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Contacto -->
+  <section class="container contact" id="contacto" aria-labelledby="contacto-titulo">
+    <div class="contact-text">
+      <h2 id="contacto-titulo" class="title">Pide tu presupuesto</h2>
+      <p>
+        Rellena el formulario y se abrirá tu correo con el mensaje listo para enviar. Te respondemos en un día laborable.
+      </p>
+      <ul class="direct">
+        <li><Icon name="phone" /><a href={`tel:${tel(radio.telefono)}`}>{radio.telefono}</a></li>
+        <li>
+          <Icon name="message-circle" />
+          <a href={`https://wa.me/34${tel(radio.whatsapp)}`} target="_blank" rel="noopener noreferrer">WhatsApp {radio.whatsapp}</a>
+        </li>
+        <li><Icon name="mail" /><a href={`mailto:${radio.correo}`}>{radio.correo}</a></li>
+      </ul>
+    </div>
+
+    <form class="form" id="ad-form" data-to={radio.correo} novalidate>
+      <dgonmej-ui-text-field name="nombre" label="Tu nombre" autocomplete="name" required></dgonmej-ui-text-field>
+      <dgonmej-ui-text-field name="negocio" label="Negocio o entidad" autocomplete="organization"></dgonmej-ui-text-field>
+      <dgonmej-ui-text-field name="telefono" type="tel" label="Teléfono de contacto" autocomplete="tel"></dgonmej-ui-text-field>
+      <dgonmej-ui-select name="formato" label="Qué te interesa" value="Todavía no lo sé" data-options={JSON.stringify(opciones)}></dgonmej-ui-select>
+      <dgonmej-ui-textarea
+        name="mensaje"
+        label="Cuéntanos tu idea"
+        placeholder="Qué quieres anunciar y en qué fechas"
+        rows="4"
+        required
+      ></dgonmej-ui-textarea>
+      <p class="privacy">
+        Usamos estos datos solo para responderte. Más información en la <a href={`${base}legal/privacidad/`}>política de privacidad</a>.
+      </p>
+      <dgonmej-ui-button id="ad-send" variant="primary">
+        <Icon name="mail" size={18} />Preparar el correo
+      </dgonmej-ui-button>
+    </form>
+  </section>
+</Layout>
+
+<script>
+  // Sin servidor: el formulario compone un correo y abre la aplicacion de correo del visitante
+  type Field = HTMLElement & { value: string; error: string; options?: unknown };
+
+  const setup = () => {
+    const form = document.getElementById('ad-form') as HTMLFormElement | null;
+    if (!form || form.dataset.ready) return;
+    form.dataset.ready = 'true';
+
+    const select = form.querySelector('dgonmej-ui-select') as Field;
+    customElements.whenDefined('dgonmej-ui-select').then(() => {
+      select.options = JSON.parse(select.dataset.options ?? '[]');
+    });
+
+    const get = (name: string) => form.querySelector(`[name="${name}"]`) as Field;
+    const send = () => {
+      const nombre = get('nombre');
+      const mensaje = get('mensaje');
+      nombre.error = nombre.value?.trim() ? '' : 'Escribe tu nombre para saber a quién responder.';
+      mensaje.error = mensaje.value?.trim() ? '' : 'Cuéntanos qué quieres anunciar.';
+      if (nombre.error || mensaje.error) {
+        (nombre.error ? nombre : mensaje).focus();
+        return;
+      }
+      const negocio = get('negocio').value?.trim();
+      const telefono = get('telefono').value?.trim();
+      const lineas = [
+        mensaje.value.trim(),
+        '',
+        `Formato: ${select.value}`,
+        `Nombre: ${nombre.value.trim()}`,
+        negocio ? `Negocio: ${negocio}` : '',
+        telefono ? `Teléfono: ${telefono}` : '',
+      ].filter((l, i) => l !== '' || i === 1);
+      const asunto = `Publicidad en Mínima FM${negocio ? `: ${negocio}` : ''}`;
+      window.location.href = `mailto:${form.dataset.to}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(lineas.join('\n'))}`;
+    };
+
+    // El aviso de error desaparece en cuanto se empieza a escribir
+    form.addEventListener('ui-input', (e) => {
+      const field = e.target as Field;
+      if (field.error) field.error = '';
+    });
+
+    document.getElementById('ad-send')!.addEventListener('ui-click', send);
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      send();
+    });
+  };
+  document.addEventListener('astro:page-load', setup);
+</script>
+
+<style>
+  .title {
+    margin: 0 0 var(--ui-space-5);
+    font-family: var(--ui-font-family-display);
+    font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+    font-weight: 700;
+    letter-spacing: var(--ui-letter-spacing-tight);
+    line-height: 1.1;
+  }
+
+  /* ---------- Cabecera ---------- */
+  .head {
+    padding-block: calc(var(--ui-space-8) * 1.5) var(--ui-space-8);
+  }
+
+  .eyebrow {
+    margin: 0 0 var(--ui-space-3);
+    color: var(--ui-color-primary-text);
+    font-weight: 700;
+  }
+
+  h1 {
+    max-width: 15em;
+    margin: 0;
+    font-family: var(--ui-font-family-display);
+    font-size: clamp(2.25rem, 6vw, 3.75rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+  }
+
+  .intro {
+    max-width: 36em;
+    margin: var(--ui-space-5) 0 0;
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-title3);
+    line-height: 1.5;
+  }
+
+  .head-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-space-3);
+    margin-top: var(--ui-space-6);
+  }
+
+  /* ---------- Tarifario ---------- */
+  .rates {
+    padding-block: var(--ui-space-8);
+  }
+
+  .rates-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0 var(--ui-space-4);
+  }
+
+  .rates-head p {
+    margin: 0 0 var(--ui-space-5);
+    color: var(--ui-color-text-muted);
+  }
+
+  .rate-card {
+    overflow: hidden;
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-color-surface);
+    box-shadow:
+      inset 0 0 0 1px var(--ui-color-border),
+      var(--ui-shadow-sm);
+  }
+
+  /* Franja de color del logo arriba del tarifario */
+  .rate-card::before {
+    content: '';
+    display: block;
+    height: 4px;
+    background: var(--brand-sunset);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: var(--ui-space-4) var(--ui-space-5);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  thead th {
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 600;
+  }
+
+  tbody tr {
+    border-top: 1px solid var(--ui-color-separator);
+  }
+
+  tbody tr.top {
+    background: var(--ui-color-primary-tint);
+  }
+
+  tbody th {
+    display: grid;
+    gap: 2px;
+    font-weight: 400;
+  }
+
+  .franja {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ui-space-2);
+    font-size: var(--ui-font-size-title3);
+    font-weight: 700;
+  }
+
+  .horario {
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-subhead);
+  }
+
+  .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  td.num {
+    font-size: var(--ui-font-size-title3);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 479px) {
+    th,
+    td {
+      padding: var(--ui-space-3);
+    }
+    td.num {
+      font-size: var(--ui-font-size-body);
+    }
+  }
+
+  .note {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-2);
+    margin: 0;
+    padding: var(--ui-space-4) var(--ui-space-5);
+    border-top: 1px solid var(--ui-color-separator);
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-subhead);
+  }
+
+  .note :global(.icon) {
+    flex: none;
+    color: var(--ui-color-primary-text);
+  }
+
+  /* ---------- Formatos ---------- */
+  .formats-section {
+    padding-block: var(--ui-space-8);
+  }
+
+  .formats {
+    display: grid;
+    gap: 0 var(--ui-space-8);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 900px) {
+    .formats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .formats li {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    gap: var(--ui-space-4);
+    align-items: start;
+    padding-block: var(--ui-space-5);
+    border-top: 1px solid var(--ui-color-separator);
+  }
+
+  .format-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--ui-radius-md);
+    color: var(--ui-color-primary-text);
+    background: var(--ui-color-primary-tint);
+  }
+
+  .formats h3 {
+    margin: 0 0 var(--ui-space-1);
+    font-size: var(--ui-font-size-title3);
+    font-weight: 700;
+  }
+
+  .formats p {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .price {
+    display: grid;
+    justify-items: end;
+    text-align: right;
+  }
+
+  .formats .price strong {
+    color: var(--ui-color-text);
+    font-size: var(--ui-font-size-title3);
+    white-space: nowrap;
+  }
+
+  .price span {
+    font-size: var(--ui-font-size-footnote);
+  }
+
+  @media (max-width: 479px) {
+    .formats li {
+      grid-template-columns: 44px minmax(0, 1fr);
+    }
+    .price {
+      grid-column: 2;
+      justify-items: start;
+      text-align: left;
+    }
+  }
+
+  /* ---------- Pasos ---------- */
+  .steps-section {
+    margin-block: var(--ui-space-8);
+    padding-block: var(--ui-space-8);
+    background: var(--ui-color-surface);
+    box-shadow:
+      inset 0 1px 0 var(--ui-color-separator),
+      inset 0 -1px 0 var(--ui-color-separator);
+  }
+
+  .steps {
+    display: grid;
+    gap: var(--ui-space-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: paso;
+  }
+
+  @media (min-width: 760px) {
+    .steps {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .step-num {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--ui-gradient-primary);
+    font-weight: 700;
+  }
+
+  .steps h3 {
+    margin: var(--ui-space-3) 0 var(--ui-space-1);
+    font-size: var(--ui-font-size-title3);
+    font-weight: 700;
+  }
+
+  .steps p {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  /* ---------- Contacto ---------- */
+  .contact {
+    display: grid;
+    gap: var(--ui-space-8);
+    padding-block: var(--ui-space-8);
+  }
+
+  @media (min-width: 900px) {
+    .contact {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+      align-items: start;
+    }
+  }
+
+  .contact-text p {
+    max-width: 30em;
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .direct {
+    display: grid;
+    gap: var(--ui-space-3);
+    margin: var(--ui-space-6) 0 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 600;
+  }
+
+  .direct li {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-3);
+  }
+
+  .direct :global(.icon) {
+    flex: none;
+    color: var(--ui-color-primary-text);
+  }
+
+  .direct a {
+    color: var(--ui-color-text);
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .direct a:hover {
+      color: var(--ui-color-primary-text);
+      text-decoration: underline;
+    }
+  }
+
+  .form {
+    display: grid;
+    gap: var(--ui-space-4);
+    padding: var(--ui-space-6);
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-color-surface);
+    box-shadow:
+      inset 0 0 0 1px var(--ui-color-border),
+      var(--ui-shadow-lg);
+  }
+
+  .form dgonmej-ui-button {
+    justify-self: start;
+  }
+
+  .privacy {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+  }
+</style>

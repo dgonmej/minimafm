@@ -1,0 +1,51 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # minimafm usa dgonmej-ui como dependencia local (file:../dgonmej-ui),
+      # asi que se descargan los dos repositorios uno al lado del otro.
+      - uses: actions/checkout@v4
+        with:
+          path: minimafm
+      - uses: actions/checkout@v4
+        with:
+          repository: dgonmej/dgonmej-ui
+          path: dgonmej-ui
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build dgonmej-ui
+        working-directory: dgonmej-ui
+        run: npm ci && npm run build
+      - name: Build site
+        working-directory: minimafm
+        run: npm ci && npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: minimafm/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

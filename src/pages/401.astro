@@ -1,0 +1,78 @@
+---
+/*
+ * Pagina para accesos no autorizados. La web es estatica y no tiene zona privada:
+ * queda lista por si se anade una (o un servidor que devuelva 401 con esta pagina).
+ */
+import Layout from '../layouts/Layout.astro';
+import OnAir from '../components/illustrations/OnAir.astro';
+import { radio } from '../data/radio';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title="Acceso restringido" description="Esta zona es solo para el equipo de la radio.">
+  <div class="container error fill">
+    <div class="text">
+      <p class="code">Error 401</p>
+      <h1 class="page-title">Estamos en el aire: no se puede pasar</h1>
+      <p class="page-intro">
+        Esta zona es solo para el equipo de {radio.nombre}. Si formas parte de él, entra con tu cuenta; si no, te esperamos
+        al otro lado de la radio.
+      </p>
+      <div class="actions">
+        <dgonmej-ui-button variant="primary" href={base}>Volver al inicio</dgonmej-ui-button>
+        <dgonmej-ui-button variant="secondary" href={`${base}la-radio/`}>Conocer al equipo</dgonmej-ui-button>
+      </div>
+    </div>
+    <div class="art">
+      <OnAir />
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .error {
+    display: grid;
+    gap: var(--ui-space-6);
+    align-items: center;
+    padding-block: calc(var(--ui-space-8) * 1.5);
+  }
+
+  /* Dos columnas en escritorio y en pantallas apaisadas (movil en horizontal) */
+  @media (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
+    .error {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: calc(var(--ui-space-8) * 1.5);
+    }
+  }
+
+  /* En movil la ilustracion va primero */
+  @media (max-width: 899px) and (orientation: portrait), (max-width: 599px) {
+    .art {
+      order: -1;
+    }
+  }
+
+  .art {
+    max-width: 560px;
+  }
+
+  .text {
+    display: grid;
+    justify-items: start;
+    gap: var(--ui-space-4);
+  }
+
+  .code {
+    margin: 0;
+    color: var(--ui-color-primary-text);
+    font-weight: 700;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-space-3);
+    margin-top: var(--ui-space-2);
+  }
+</style>

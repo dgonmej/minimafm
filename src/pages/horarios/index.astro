@@ -1,0 +1,24 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Schedule from '../../components/Schedule.astro';
+---
+
+<Layout title="Horarios" description="La parrilla semanal de Mínima FM, día a día y en hora de Canarias.">
+  <div class="container">
+    <header class="page-head">
+      <h1 class="page-title">Horarios</h1>
+      <p class="page-intro">
+        La parrilla de toda la semana, en hora de Canarias. Entre programa y programa, música continua las 24 horas.
+      </p>
+    </header>
+    <div class="wrap">
+      <Schedule />
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .wrap {
+    max-width: 760px;
+  }
+</style>

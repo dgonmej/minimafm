@@ -1,0 +1,108 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
+import Icon from './Icon.astro';
+
+const base = import.meta.env.BASE_URL;
+const links = [
+  { href: `${base}`, label: 'Inicio', icon: 'house' },
+  { href: `${base}programas/`, label: 'Programas', icon: 'radio' },
+  { href: `${base}horarios/`, label: 'Horarios', icon: 'calendar' },
+  { href: `${base}eventos/`, label: 'Eventos', icon: 'star' },
+  { href: `${base}noticias/`, label: 'Noticias', icon: 'bell' },
+  { href: `${base}la-radio/`, label: 'La radio', icon: 'radio' },
+];
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => (href === base ? path === base : path.startsWith(href));
+const menuItems = links.map((l) => ({ value: l.href, label: l.label, icon: l.icon }));
+---
+
+<dgonmej-ui-nav-bar class="site-nav" style="--ui-nav-bar-max-width: var(--site-max)">
+  <a slot="leading" class="brand" href={base} aria-label="Mínima FM, inicio">
+    <Image src={logo} alt="" width={120} loading="eager" />
+  </a>
+
+  {
+    links.map((l) => (
+      <dgonmej-ui-button
+        slot="trailing"
+        class="wide-only nav-link"
+        variant="ghost"
+        size="small"
+        href={l.href}
+        current={isCurrent(l.href) ? 'page' : undefined}
+      >
+        {l.label}
+      </dgonmej-ui-button>
+    ))
+  }
+
+  <dgonmej-ui-menu slot="trailing" class="narrow-only" id="site-menu" placement="bottom-end" label="Secciones" data-items={JSON.stringify(menuItems)}>
+    <dgonmej-ui-button slot="trigger" variant="secondary" size="small">
+      <Icon name="menu" size={16} /><span class="menu-label">Menú</span>
+    </dgonmej-ui-button>
+  </dgonmej-ui-menu>
+
+  <!-- En pantallas de menos de 360px no cabe: se muestra en el pie -->
+  <dgonmej-ui-theme-toggle slot="trailing" class="nav-theme" compact></dgonmej-ui-theme-toggle>
+</dgonmej-ui-nav-bar>
+
+<script>
+  import { navigate } from 'astro:transitions/client';
+
+  // Menu movil: rellenar opciones y navegar sin recargar (el reproductor sigue sonando)
+  const setup = () => {
+    const menu = document.getElementById('site-menu') as (HTMLElement & { items: unknown }) | null;
+    if (!menu || menu.dataset.ready) return;
+    menu.dataset.ready = 'true';
+    menu.items = JSON.parse(menu.dataset.items ?? '[]');
+    menu.addEventListener('ui-select', (event) => navigate((event as CustomEvent<{ value: string }>).detail.value));
+  };
+  document.addEventListener('astro:page-load', setup);
+</script>
+
+<style>
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    /* Placa clara: el logo (añil y atardecer) se lee igual en tema claro y oscuro */
+    border-radius: var(--ui-radius-md);
+    background: #fffdfb;
+    box-shadow: inset 0 0 0 1px rgb(80 60 45 / 0.1);
+  }
+
+  .brand :global(img) {
+    width: 104px;
+    height: auto;
+  }
+
+  @media (max-width: 359px) {
+    .nav-theme {
+      display: none;
+    }
+  }
+
+  /* Moviles estrechos: menu solo con icono (el texto queda para lectores de pantalla) y logo mas pequeno */
+  @media (max-width: 479px) {
+    .menu-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+    .brand {
+      padding: 4px 8px;
+    }
+    .brand :global(img) {
+      width: 84px;
+    }
+  }
+
+  .nav-link[current='page']::part(control) {
+    color: var(--ui-color-text);
+    background: var(--ui-color-fill);
+  }
+</style>
