@@ -1,15 +1,13 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getPaginas } from '../../lib/api';
+import { renderMarkdown } from '../../lib/markdown';
 import Layout from '../../layouts/Layout.astro';
 import { formatoFecha, iso } from '../../lib/format';
 
-export async function getStaticPaths() {
-  const docs = (await getCollection('legal')).sort((a, b) => a.data.orden - b.data.orden);
-  return docs.map((doc) => ({ params: { id: doc.id }, props: { doc, docs } }));
-}
-
-const { doc, docs } = Astro.props;
-const { Content, headings } = await render(doc);
+const docs = (await getPaginas()).sort((a, b) => a.data.orden - b.data.orden);
+const doc = docs.find((d) => d.id === Astro.params.id);
+if (!doc) return Astro.rewrite('/404/');
+const { html, headings } = renderMarkdown(doc.cuerpo);
 const base = import.meta.env.BASE_URL;
 const indice = headings.filter((h) => h.depth === 2);
 ---
@@ -57,7 +55,7 @@ const indice = headings.filter((h) => h.depth === 2);
         </p>
       </header>
       <div class="prose">
-        <Content />
+        <Fragment set:html={html} />
       </div>
     </article>
   </div>

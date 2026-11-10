@@ -1,23 +1,11 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
-import { programas, radio } from '../../data/radio';
+import { getEquipo, getHistoria, getProgramas, getRadio } from '../../lib/api';
 
 const base = import.meta.env.BASE_URL;
 
-// DATOS DE PRUEBA: historia y equipo ficticios
-const historia = [
-  { anio: '1998', titulo: 'Una radio en un cuarto', texto: 'Un grupo de vecinos monta una emisora con un transmisor prestado en el local de la asociación cultural.' },
-  { anio: '2004', titulo: 'Estudio en la plaza', texto: 'Nos mudamos a la plaza de San Pedro, con un estudio de verdad y la puerta siempre abierta.' },
-  { anio: '2012', titulo: 'También por internet', texto: 'Empezamos a emitir en directo por internet para los vecinos que viven fuera del Valle.' },
-  { anio: '2020', titulo: 'Más cerca que nunca', texto: 'Durante el confinamiento, la radio se convierte en el punto de encuentro del municipio.' },
-  { anio: '2026', titulo: 'Nueva web', texto: 'Estrenamos web para escucharnos, ver la parrilla y seguir la agenda desde cualquier sitio.' },
-];
-
-const equipoFijo = [
-  { nombre: 'Marta Perera', papel: 'Dirección' },
-  { nombre: 'Yeray González', papel: 'Técnico de sonido' },
-];
+const [radio, programas, historia, equipoFijo] = await Promise.all([getRadio(), getProgramas(), getHistoria(), getEquipo()]);
 
 // Presentadores sacados de la parrilla, con sus programas
 const presentadores = [...new Set(programas.map((p) => p.presentador))]

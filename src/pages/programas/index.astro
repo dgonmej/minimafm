@@ -1,7 +1,9 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ProgramFeature from '../../components/ProgramFeature.astro';
-import { programas } from '../../data/radio';
+import { getProgramas } from '../../lib/api';
+
+const programas = await getProgramas();
 
 const categorias = ['Todos', ...new Set(programas.map((p) => p.categoria))];
 ---
@@ -36,7 +38,7 @@ const categorias = ['Todos', ...new Set(programas.map((p) => p.categoria))];
 </Layout>
 
 <script>
-  import { enAntena } from '../../lib/schedule';
+  import { enAntena, parrilla } from '../../lib/schedule';
 
   const setup = () => {
     const filter = document.getElementById('filter') as (HTMLElement & { options: unknown }) | null;
@@ -54,7 +56,7 @@ const categorias = ['Todos', ...new Set(programas.map((p) => p.categoria))];
     });
 
     // Marca "En antena" el programa que suena ahora
-    const { actual } = enAntena();
+    const { actual } = enAntena(parrilla());
     document.querySelectorAll<HTMLElement>('[data-program]').forEach((card) => {
       const badge = card.querySelector<HTMLElement>('.on-air');
       if (badge) badge.hidden = card.dataset.program !== actual?.programa.id;

@@ -1,6 +1,7 @@
 ---
 import { dias } from '../data/radio';
 import { emisionesDelDia } from '../lib/schedule';
+import { getProgramas } from '../lib/api';
 
 interface Props {
   /** Solo el dia de hoy (portada) o la semana entera (pagina de horarios) */
@@ -9,7 +10,8 @@ interface Props {
 
 const { soloHoy = false } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const semana = dias.map((nombre, i) => ({ nombre, i, emisiones: emisionesDelDia(i) }));
+const programas = await getProgramas();
+const semana = dias.map((nombre, i) => ({ nombre, i, emisiones: emisionesDelDia(i, programas) }));
 const opciones = dias.map((nombre, i) => ({ value: String(i), label: nombre.slice(0, 3) }));
 ---
 

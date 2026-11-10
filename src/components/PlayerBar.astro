@@ -1,7 +1,9 @@
 ---
 import { getImage } from 'astro:assets';
 import logo from '../assets/logo.png';
-import { radio } from '../data/radio';
+import { getRadio } from '../lib/api';
+
+const radio = await getRadio();
 
 // Portada del reproductor (tambien la usan los controles del sistema en el movil)
 const artwork = await getImage({ src: logo, width: 500, format: 'png' });
@@ -24,12 +26,12 @@ const artwork = await getImage({ src: logo, width: 500, format: 'png' });
 </div>
 
 <script>
-  import { enAntena } from '../lib/schedule';
+  import { enAntena, parrilla } from '../lib/schedule';
 
   // Actualiza "Ahora: ..." en el reproductor cada minuto
   const player = document.getElementById('player') as HTMLElement & { subheading: string };
   const update = () => {
-    const { actual, continuidad } = enAntena();
+    const { actual, continuidad } = enAntena(parrilla());
     player.subheading = `Ahora: ${actual ? actual.programa.nombre : continuidad.nombre}`;
   };
   update();

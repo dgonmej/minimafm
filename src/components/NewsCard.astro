@@ -1,9 +1,9 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import type { Noticia } from '../lib/api';
 import { formatoFecha, iso } from '../lib/format';
 
 interface Props {
-  noticia: CollectionEntry<'noticias'>;
+  noticia: Noticia;
   destacada?: boolean;
 }
 

@@ -5,14 +5,17 @@ import { ClientRouter } from 'astro:transitions';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import PlayerBar from '../components/PlayerBar.astro';
-import { radio } from '../data/radio';
+import { getProgramas, getRadio } from '../lib/api';
 
 interface Props {
   title?: string;
   description?: string;
 }
 
+const radio = await getRadio();
 const { title, description = radio.descripcion } = Astro.props;
+// Programas para calcular en el navegador lo que suena ahora (ver parrilla() en lib/schedule.ts)
+const parrilla = (await getProgramas()).map(({ id, nombre, presentador, franjas }) => ({ id, nombre, presentador, franjas }));
 const fullTitle = title ? `${title} | ${radio.nombre} ${radio.frecuencia}` : `${radio.nombre} ${radio.frecuencia} | La voz del Valle`;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -65,6 +68,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <a class="skip-link" href="#main">Saltar al contenido</a>
+    <script type="application/json" id="parrilla-data" set:html={JSON.stringify(parrilla).replace(/</g, '\\u003c')} />
     <Nav />
     <main id="main">
       <slot />

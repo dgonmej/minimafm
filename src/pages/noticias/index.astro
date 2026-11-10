@@ -1,10 +1,10 @@
 ---
-import { getCollection } from 'astro:content';
+import { getNoticias } from '../../lib/api';
 import Layout from '../../layouts/Layout.astro';
 import { formatoFecha, formatoFechaLarga, iso } from '../../lib/format';
 
 const base = import.meta.env.BASE_URL;
-const noticias = (await getCollection('noticias')).sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime());
+const noticias = (await getNoticias()).sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime());
 
 // Portada: la mas reciente en grande y las siguientes en la columna de "Lo ultimo"
 const [principal, ...resto] = noticias;

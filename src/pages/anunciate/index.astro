@@ -1,49 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
-import { radio } from '../../data/radio';
+import { getFormatos, getRadio, getTarifas } from '../../lib/api';
+
+const [radio, franjas, formatos] = await Promise.all([getRadio(), getTarifas(), getFormatos()]);
 
 const base = import.meta.env.BASE_URL;
 const tel = (n: string) => n.replace(/\s/g, '');
 
-// DATOS DE PRUEBA: tarifas ficticias, sin IGIC
-const franjas = [
-  { nombre: 'Despertador', horario: 'De lunes a viernes, de 07:00 a 10:00', precio20: 12, precio30: 15, destacada: true },
-  { nombre: 'Mañana', horario: 'De lunes a viernes, de 10:00 a 14:00', precio20: 9, precio30: 11 },
-  { nombre: 'Tarde', horario: 'De lunes a viernes, de 14:00 a 20:00', precio20: 7, precio30: 9 },
-  { nombre: 'Noche y fin de semana', horario: 'De 20:00 a 07:00, sábados y domingos', precio20: 5, precio30: 6 },
-];
-
-const formatos = [
-  {
-    icono: 'shopping-basket',
-    nombre: 'Comercio del barrio',
-    precio: '290 €',
-    unidad: 'al mes',
-    texto: '60 cuñas de 20 segundos al mes, repartidas entre la mañana y la tarde. Ideal para tiendas, bares y talleres.',
-  },
-  {
-    icono: 'mic',
-    nombre: 'Patrocinio de programa',
-    precio: 'Desde 150 €',
-    unidad: 'al mes',
-    texto: 'Tu marca presenta un programa: mención al principio y al final de cada emisión y una cuña diaria.',
-  },
-  {
-    icono: 'message-circle',
-    nombre: 'Mención en directo',
-    precio: '20 €',
-    unidad: 'cada una',
-    texto: 'El presentador habla de tu negocio o tu oferta con sus propias palabras, en mitad del programa.',
-  },
-  {
-    icono: 'party-popper',
-    nombre: 'Cobertura de evento',
-    precio: '90 €',
-    unidad: 'por evento',
-    texto: 'Cuñas la semana antes, entrevista en antena y el evento destacado en la agenda de la web.',
-  },
-] as const;
 
 const pasos = [
   { titulo: 'Nos cuentas tu idea', texto: 'Qué quieres anunciar, a quién y en qué fechas.' },
@@ -51,14 +15,7 @@ const pasos = [
   { titulo: 'Suena en el Valle', texto: 'Programamos las cuñas en las franjas elegidas y te mandamos el plan de emisión.' },
 ];
 
-const opciones = [
-  { value: 'Cuñas sueltas', label: 'Cuñas sueltas' },
-  { value: 'Comercio del barrio', label: 'Comercio del barrio' },
-  { value: 'Patrocinio de programa', label: 'Patrocinio de programa' },
-  { value: 'Mención en directo', label: 'Mención en directo' },
-  { value: 'Cobertura de evento', label: 'Cobertura de evento' },
-  { value: 'Todavía no lo sé', label: 'Todavía no lo sé' },
-];
+const opciones = ['Cuñas sueltas', ...formatos.map((f) => f.nombre), 'Todavía no lo sé'].map((o) => ({ value: o, label: o }));
 ---
 
 <Layout title="Anúnciate" description="Tarifas de publicidad en Mínima FM: cuñas, patrocinios y menciones en directo para negocios del Valle de Güímar.">

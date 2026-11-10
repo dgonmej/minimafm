@@ -1,16 +1,13 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getEvento } from '../../lib/api';
+import { renderMarkdown } from '../../lib/markdown';
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
 import { formatoFechaLarga, iconoEvento, iso } from '../../lib/format';
 
-export async function getStaticPaths() {
-  const eventos = await getCollection('eventos');
-  return eventos.map((evento) => ({ params: { id: evento.id }, props: { evento } }));
-}
-
-const { evento } = Astro.props;
-const { Content } = await render(evento);
+const evento = await getEvento(Astro.params.id!);
+if (!evento) return Astro.rewrite('/404/');
+const { html } = renderMarkdown(evento.cuerpo);
 const { titulo, fecha, hora, lugar, categoria, resumen } = evento.data;
 const base = import.meta.env.BASE_URL;
 ---
@@ -34,7 +31,7 @@ const base = import.meta.env.BASE_URL;
     </ul>
 
     <div class="prose">
-      <Content />
+      <Fragment set:html={html} />
     </div>
   </article>
 </Layout>

@@ -1,5 +1,4 @@
 ---
-import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Hero from '../components/Hero.astro';
 import Schedule from '../components/Schedule.astro';
@@ -7,24 +6,29 @@ import ProgramCard from '../components/ProgramCard.astro';
 import EventCard from '../components/EventCard.astro';
 import NewsCard from '../components/NewsCard.astro';
 import Icon from '../components/Icon.astro';
-import { programas, radio } from '../data/radio';
+import { getEventos, getNoticias, getProgramas, getRadio } from '../lib/api';
+
+const [radio, programas, todosEventos, todasNoticias] = await Promise.all([getRadio(), getProgramas(), getEventos(), getNoticias()]);
 
 const base = import.meta.env.BASE_URL;
 const hoy = new Date(new Date().toDateString());
 
-// Proximos eventos (los pasados desaparecen solos en cada compilacion)
-const eventos = (await getCollection('eventos'))
+// Proximos eventos
+const eventos = todosEventos
   .filter((e) => e.data.fecha >= hoy)
   .sort((a, b) => a.data.fecha.getTime() - b.data.fecha.getTime())
   .slice(0, 3);
 
-const [destacada, ...otras] = (await getCollection('noticias'))
+const [destacada, ...otras] = todasNoticias
   .sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime())
   .slice(0, 3);
 
-const destacados = ['buenos-dias-valle', 'raices', 'voces-del-valle', 'sabado-de-parranda']
-  .map((id) => programas.find((p) => p.id === id)!)
-  .filter(Boolean);
+// Cuatro programas destacados: los de esta lista y, si falta alguno, los primeros del resto
+const preferidos = ['buenos-dias-valle', 'raices', 'voces-del-valle', 'sabado-de-parranda'];
+const destacados = [
+  ...preferidos.map((id) => programas.find((p) => p.id === id)).filter((p) => p !== undefined),
+  ...programas.filter((p) => !preferidos.includes(p.id)),
+].slice(0, 4);
 
 const tel = (n: string) => n.replace(/\s/g, '');
 ---

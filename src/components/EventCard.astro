@@ -1,10 +1,10 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import type { Evento } from '../lib/api';
 import Icon from './Icon.astro';
 import { iconoEvento, partesFecha, formatoFechaLarga, iso } from '../lib/format';
 
 interface Props {
-  evento: CollectionEntry<'eventos'>;
+  evento: Evento;
 }
 
 const { evento } = Astro.props;

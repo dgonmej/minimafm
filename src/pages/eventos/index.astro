@@ -1,12 +1,12 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getEventos, type Evento } from '../../lib/api';
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
 import { formatoFecha, formatoFechaLarga, iconoEvento, iso } from '../../lib/format';
 
 const base = import.meta.env.BASE_URL;
 const hoy = new Date(new Date().toDateString());
-const todos = (await getCollection('eventos')).sort((a, b) => a.data.fecha.getTime() - b.data.fecha.getTime());
+const todos = (await getEventos()).sort((a, b) => a.data.fecha.getTime() - b.data.fecha.getTime());
 const proximos = todos.filter((e) => e.data.fecha >= hoy);
 const pasados = todos.filter((e) => e.data.fecha < hoy).reverse();
 
@@ -18,7 +18,7 @@ const diaSemana = new Intl.DateTimeFormat('es-ES', { weekday: 'short', timeZone:
 const diaMes = new Intl.DateTimeFormat('es-ES', { day: 'numeric', timeZone: tz });
 const mayuscula = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-const meses = new Map<string, { id: string; nombre: string; anio: string; eventos: CollectionEntry<'eventos'>[] }>();
+const meses = new Map<string, { id: string; nombre: string; anio: string; eventos: Evento[] }>();
 for (const e of proximos) {
   const id = `mes-${iso(e.data.fecha).slice(0, 7)}`;
   if (!meses.has(id)) {

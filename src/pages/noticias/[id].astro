@@ -1,15 +1,12 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getNoticia } from '../../lib/api';
+import { renderMarkdown } from '../../lib/markdown';
 import Layout from '../../layouts/Layout.astro';
 import { formatoFechaLarga, iso } from '../../lib/format';
 
-export async function getStaticPaths() {
-  const noticias = await getCollection('noticias');
-  return noticias.map((noticia) => ({ params: { id: noticia.id }, props: { noticia } }));
-}
-
-const { noticia } = Astro.props;
-const { Content } = await render(noticia);
+const noticia = await getNoticia(Astro.params.id!);
+if (!noticia) return Astro.rewrite('/404/');
+const { html } = renderMarkdown(noticia.cuerpo);
 const { titulo, fecha, categoria, autor, resumen } = noticia.data;
 const base = import.meta.env.BASE_URL;
 ---
@@ -34,7 +31,7 @@ const base = import.meta.env.BASE_URL;
     </header>
 
     <div class="prose">
-      <Content />
+      <Fragment set:html={html} />
     </div>
   </article>
 </Layout>

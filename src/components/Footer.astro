@@ -2,7 +2,9 @@
 import { Image } from 'astro:assets';
 import logoFull from '../assets/logo-full.png';
 import Icon from './Icon.astro';
-import { radio } from '../data/radio';
+import { getRadio } from '../lib/api';
+
+const radio = await getRadio();
 
 const base = import.meta.env.BASE_URL;
 const year = new Date().getFullYear();
@@ -57,8 +59,13 @@ const tel = (n: string) => n.replace(/\s/g, '');
       </nav>
     </div>
     <p class="socials">
-      <a href={radio.redes[0].url} rel="noopener noreferrer" aria-label="Facebook"><Icon name="facebook" /></a>
-      <a href={radio.redes[1].url} rel="noopener noreferrer" aria-label="Instagram"><Icon name="instagram" /></a>
+      {
+        radio.redes.map((red) => (
+          <a href={red.url} rel="noopener noreferrer" aria-label={red.nombre}>
+            <Icon name={red.nombre === 'Facebook' ? 'facebook' : 'instagram'} />
+          </a>
+        ))
+      }
     </p>
   </div>
 </footer>

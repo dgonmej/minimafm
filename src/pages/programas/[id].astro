@@ -1,21 +1,16 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
-import { programas, dias, radio } from '../../data/radio';
+import { dias } from '../../data/radio';
+import { getProgramas, getRadio } from '../../lib/api';
 import { describirFranja, iconoPrograma, tonoPrograma } from '../../lib/format';
 
-export function getStaticPaths() {
-  return programas.map((programa, i) => ({
-    params: { id: programa.id },
-    props: {
-      programa,
-      anterior: programas[(i - 1 + programas.length) % programas.length],
-      siguiente: programas[(i + 1) % programas.length],
-    },
-  }));
-}
-
-const { programa, anterior, siguiente } = Astro.props;
+const [programas, radio] = await Promise.all([getProgramas(), getRadio()]);
+const i = programas.findIndex((p) => p.id === Astro.params.id);
+if (i < 0) return Astro.rewrite('/404/');
+const programa = programas[i];
+const anterior = programas[(i - 1 + programas.length) % programas.length];
+const siguiente = programas[(i + 1) % programas.length];
 const base = import.meta.env.BASE_URL;
 const diasQueSuena = new Set(programa.franjas.flatMap((f) => f.dias));
 const iniciales = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
@@ -138,14 +133,14 @@ const mismoTipo = programas.filter((p) => p.categoria === programa.categoria && 
 </Layout>
 
 <script>
-  import { proximaEmision } from '../../lib/schedule';
+  import { proximaEmision, parrilla } from '../../lib/schedule';
   import { dias } from '../../data/radio';
 
   // Proxima emision en lenguaje natural y aviso si esta sonando ahora
   const setup = () => {
     const box = document.querySelector<HTMLElement>('[data-program]');
     if (!box) return;
-    const p = proximaEmision(box.dataset.program!);
+    const p = proximaEmision(box.dataset.program!, parrilla());
     const next = box.querySelector<HTMLElement>('[data-next]')!;
     const onAir = document.querySelector<HTMLElement>('[data-on-air]')!;
     if (!p) return;

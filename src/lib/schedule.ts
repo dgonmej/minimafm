@@ -1,8 +1,9 @@
 /*
- * Utilidades de la parrilla. Se usan al compilar (para pintar la parrilla) y en el
- * navegador (para saber que suena ahora, en hora canaria).
+ * Utilidades de la parrilla. Se usan en el servidor (para pintar la parrilla) y en el
+ * navegador (para saber que suena ahora, en hora canaria). Reciben la lista de programas:
+ * en el navegador sale de parrilla(), que la lee de la propia pagina.
  */
-import { programas, continuidad, type Programa } from '../data/radio';
+import { continuidad, type Programa } from '../data/radio';
 
 export type Emision = {
   programa: Programa;
@@ -16,13 +17,20 @@ const minutos = (hora: string) => {
   return h * 60 + m;
 };
 
+/** Programas incrustados en la pagina por Layout.astro (solo en el navegador). */
+export function parrilla(): Programa[] {
+  try {
+    return JSON.parse(document.getElementById('parrilla-data')?.textContent ?? '[]');
+  } catch {
+    return [];
+  }
+}
+
 /** Emisiones de un dia (0 = lunes), ordenadas por hora. */
-export function emisionesDelDia(dia: number): Emision[] {
+export function emisionesDelDia(dia: number, programas: Programa[]): Emision[] {
   return programas
     .flatMap((programa) =>
-      programa.franjas
-        .filter((f) => f.dias.includes(dia))
-        .map((f) => ({ programa, dia, inicio: f.inicio, fin: f.fin }))
+      programa.franjas.filter((f) => f.dias.includes(dia)).map((f) => ({ programa, dia, inicio: f.inicio, fin: f.fin }))
     )
     .sort((a, b) => minutos(a.inicio) - minutos(b.inicio));
 }
@@ -43,33 +51,25 @@ export function ahoraEnCanarias(fecha = new Date()) {
 }
 
 /** Lo que suena ahora y lo siguiente (puede ser de otro dia). */
-export function enAntena(fecha = new Date()) {
+export function enAntena(programas: Programa[], fecha = new Date()) {
   const { dia, minuto } = ahoraEnCanarias(fecha);
-  const hoy = emisionesDelDia(dia);
+  const hoy = emisionesDelDia(dia, programas);
   const actual = hoy.find((e) => minutos(e.inicio) <= minuto && minuto < minutos(e.fin)) ?? null;
 
   // Siguiente emision: la proxima de hoy, o la primera de los dias siguientes
   let siguiente = hoy.find((e) => minutos(e.inicio) > minuto) ?? null;
   for (let i = 1; !siguiente && i <= 7; i++) {
-    siguiente = emisionesDelDia((dia + i) % 7)[0] ?? null;
+    siguiente = emisionesDelDia((dia + i) % 7, programas)[0] ?? null;
   }
   return { actual, siguiente, dia, continuidad };
 }
 
-/** ¿La emision esta sonando ahora? */
-export function estaEnAntena(e: Emision, fecha = new Date()) {
-  const { dia, minuto } = ahoraEnCanarias(fecha);
-  return e.dia === dia && minutos(e.inicio) <= minuto && minuto < minutos(e.fin);
-}
-
 /** Proxima emision de un programa (o la actual, si esta sonando). */
-export function proximaEmision(id: string, fecha = new Date()) {
+export function proximaEmision(id: string, programas: Programa[], fecha = new Date()) {
   const { dia, minuto } = ahoraEnCanarias(fecha);
   for (let i = 0; i <= 7; i++) {
     const d = (dia + i) % 7;
-    const e = emisionesDelDia(d).find(
-      (e) => e.programa.id === id && (i > 0 || minutos(e.fin) > minuto)
-    );
+    const e = emisionesDelDia(d, programas).find((e) => e.programa.id === id && (i > 0 || minutos(e.fin) > minuto));
     if (e) return { emision: e, enDias: i, sonando: i === 0 && minutos(e.inicio) <= minuto };
   }
   return null;
