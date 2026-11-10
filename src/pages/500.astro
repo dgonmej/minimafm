@@ -1,0 +1,10 @@
+---
+/*
+ * Pagina de error del servidor. Es el HTML autonomo de src/error-page/500.html (sin Layout ni
+ * API: si la API falla, cualquier pagina que la use acaba aqui). El mismo archivo lo sirve
+ * nginx cuando la web esta caida.
+ */
+import html from '../error-page/500.html?raw';
+---
+
+<Fragment set:html={html} />
