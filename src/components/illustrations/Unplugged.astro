@@ -1,0 +1,329 @@
+---
+/*
+ * Ilustracion de la pagina 404: un radiocasete con los cascos desconectados.
+ * Colores de los tokens del sitio: se adapta al tema claro y oscuro.
+ */
+---
+
+<svg class="unplugged" viewBox="0 0 560 320" role="img" aria-labelledby="unplugged-title">
+  <title id="unplugged-title">Un radiocasete con los cascos desenchufados en el suelo</title>
+  <defs>
+    <linearGradient id="u-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" class="u-body-top" />
+      <stop offset="1" class="u-body-bottom" />
+    </linearGradient>
+    <linearGradient id="u-sunset" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3d2e86" />
+      <stop offset="0.35" stop-color="#a3245b" />
+      <stop offset="0.68" stop-color="#e4572e" />
+      <stop offset="1" stop-color="#f5a623" />
+    </linearGradient>
+    <linearGradient id="u-cups" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f08a4b" />
+      <stop offset="1" stop-color="#c2410c" />
+    </linearGradient>
+  </defs>
+
+  <!-- Sombra en el suelo -->
+  <ellipse class="u-shadow" cx="290" cy="296" rx="250" ry="12" />
+
+  <!-- Antena -->
+  <g class="u-line">
+    <line x1="318" y1="78" x2="388" y2="18" />
+  </g>
+  <circle class="u-knob" cx="388" cy="18" r="6" />
+
+  <!-- Asa -->
+  <path class="u-handle" d="M118 82 V60 a14 14 0 0 1 14 -14 H306 a14 14 0 0 1 14 14 V82" />
+
+  <!-- Cuerpo -->
+  <rect class="u-body" x="60" y="78" width="320" height="200" rx="22" fill="url(#u-body)" />
+  <rect x="60" y="78" width="320" height="10" rx="5" fill="url(#u-sunset)" opacity="0.9" />
+
+  <!-- Teclas -->
+  <g class="u-keys">
+    <rect x="160" y="96" width="22" height="10" rx="3" />
+    <rect x="188" y="96" width="22" height="10" rx="3" />
+    <rect x="216" y="96" width="22" height="10" rx="3" />
+    <rect x="244" y="96" width="22" height="10" rx="3" />
+  </g>
+
+  <!-- Altavoces -->
+  <g class="u-speaker">
+    <circle cx="124" cy="192" r="50" class="u-ring-1" />
+    <circle cx="124" cy="192" r="34" class="u-ring-2" />
+    <circle cx="124" cy="192" r="12" class="u-ring-3" />
+    <circle cx="316" cy="192" r="50" class="u-ring-1" />
+    <circle cx="316" cy="192" r="34" class="u-ring-2" />
+    <circle cx="316" cy="192" r="12" class="u-ring-3" />
+  </g>
+
+  <!-- Ventana del casete -->
+  <rect class="u-window" x="182" y="120" width="76" height="52" rx="8" />
+  <rect x="190" y="126" width="60" height="9" rx="3" fill="url(#u-sunset)" />
+  <g class="u-reels">
+    <circle cx="204" cy="153" r="9" />
+    <circle cx="236" cy="153" r="9" />
+  </g>
+  <rect class="u-tape" x="204" y="150" width="32" height="6" rx="1" />
+
+  <!-- Dial y piloto apagado -->
+  <rect class="u-dial" x="182" y="186" width="76" height="10" rx="5" />
+  <line class="u-needle" x1="214" y1="183" x2="214" y2="199" />
+  <circle class="u-led" cx="220" cy="222" r="5" />
+  <text class="u-label" x="220" y="250" text-anchor="middle">97.9</text>
+
+  <!-- Clavija de auriculares en el lateral -->
+  <circle class="u-jack" cx="380" cy="236" r="6" />
+  <circle class="u-jack-glow" cx="380" cy="236" r="12" />
+
+  <!-- Cable: sale de los cascos, recorre el suelo y termina en la clavija, suelta -->
+  <path class="u-cable" d="M464 278 C 462 300, 440 298, 424 292" />
+
+  <!-- Clavija desenchufada en el suelo, apuntando a su conector -->
+  <g class="u-plug">
+    <rect x="408" y="285" width="18" height="12" rx="3" class="u-plug-body" />
+    <rect x="394" y="288.5" width="16" height="5" rx="2" class="u-plug-tip" />
+  </g>
+
+  <!-- Destellos de "sin conexion" junto al conector -->
+  <g class="u-sparks">
+    <line x1="392" y1="226" x2="398" y2="220" />
+    <line x1="394" y1="238" x2="402" y2="238" />
+    <line x1="392" y1="250" x2="398" y2="256" />
+  </g>
+
+  <!-- Cascos en el suelo -->
+  <g class="u-phones">
+    <path class="u-band" d="M462 250 C 462 196, 534 196, 534 250" />
+    <rect x="450" y="236" width="26" height="40" rx="11" fill="url(#u-cups)" />
+    <rect x="520" y="236" width="26" height="40" rx="11" fill="url(#u-cups)" />
+    <rect class="u-pad" x="470" y="244" width="8" height="24" rx="4" />
+    <rect class="u-pad" x="518" y="244" width="8" height="24" rx="4" />
+  </g>
+
+  <!-- Nota musical que se desvanece -->
+  <g class="u-note">
+    <path d="M482 150 v-34 l22 -6 v30" />
+    <circle cx="476" cy="152" r="7" />
+    <circle cx="498" cy="142" r="7" />
+  </g>
+</svg>
+
+<style>
+  .unplugged {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .u-shadow {
+    fill: var(--ui-color-text);
+    opacity: 0.08;
+  }
+
+  .u-body-top {
+    stop-color: var(--ui-color-surface);
+  }
+
+  .u-body-bottom {
+    stop-color: var(--ui-color-surface-pressed);
+  }
+
+  .u-body {
+    stroke: var(--ui-color-separator);
+    stroke-width: 2;
+  }
+
+  .u-line line,
+  .u-handle {
+    fill: none;
+    stroke: var(--ui-color-text-muted);
+    stroke-width: 6;
+    stroke-linecap: round;
+  }
+
+  .u-knob {
+    fill: var(--ui-color-text-muted);
+  }
+
+  .u-keys rect {
+    fill: var(--ui-color-fill-strong);
+  }
+
+  .u-ring-1 {
+    fill: var(--ui-color-fill-strong);
+  }
+
+  .u-ring-2 {
+    fill: var(--ui-color-fill);
+    stroke: var(--ui-color-separator);
+    stroke-width: 2;
+  }
+
+  .u-ring-3 {
+    fill: var(--ui-color-text-muted);
+    opacity: 0.5;
+  }
+
+  .u-window {
+    fill: var(--ui-color-text);
+    opacity: 0.85;
+  }
+
+  .u-reels circle {
+    fill: none;
+    stroke: var(--ui-color-surface);
+    stroke-width: 4;
+    stroke-dasharray: 4 3;
+  }
+
+  .u-tape {
+    fill: var(--ui-color-surface);
+    opacity: 0.35;
+  }
+
+  .u-dial {
+    fill: var(--ui-color-fill-strong);
+  }
+
+  .u-needle {
+    stroke: var(--site-live);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .u-led {
+    fill: var(--ui-color-fill-strong);
+    stroke: var(--ui-color-separator);
+  }
+
+  .u-label {
+    fill: var(--ui-color-text-muted);
+    font: 700 13px var(--ui-font-family);
+  }
+
+  .u-jack {
+    fill: var(--ui-color-text);
+  }
+
+  .u-jack-glow {
+    fill: none;
+    stroke: var(--ui-color-primary);
+    stroke-width: 2;
+    opacity: 0;
+    transform-origin: 380px 236px;
+  }
+
+  .u-cable {
+    fill: none;
+    stroke: var(--ui-color-text-muted);
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+
+  .u-plug-body {
+    fill: var(--ui-color-text);
+  }
+
+  .u-plug-tip {
+    fill: #c9c3bd;
+  }
+
+  .u-plug {
+    transform-origin: 426px 291px;
+  }
+
+  .u-sparks line {
+    stroke: var(--ui-color-primary);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .u-band {
+    fill: none;
+    stroke: var(--ui-color-text);
+    stroke-width: 7;
+    stroke-linecap: round;
+  }
+
+  .u-pad {
+    fill: var(--ui-color-text);
+    opacity: 0.7;
+  }
+
+  .u-note path {
+    fill: none;
+    stroke: var(--brand-anil);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .u-note circle {
+    fill: var(--brand-anil);
+  }
+
+  .u-note {
+    opacity: 0.6;
+  }
+
+  /* Un solo movimiento: la clavija se balancea, la clavija hembra busca senal y la nota se apaga */
+  @media (prefers-reduced-motion: no-preference) {
+    .u-plug {
+      animation: u-swing 2.8s cubic-bezier(0.32, 0.72, 0, 1) infinite alternate;
+    }
+    .u-jack-glow {
+      animation: u-ping 2.8s ease-out infinite;
+    }
+    .u-sparks {
+      animation: u-blink 1.4s ease-in-out infinite alternate;
+    }
+    .u-note {
+      animation: u-fade 4s ease-in-out infinite;
+    }
+  }
+
+  @keyframes u-swing {
+    from {
+      transform: translateX(0) rotate(0deg);
+    }
+    to {
+      transform: translateX(-4px) rotate(-4deg);
+    }
+  }
+
+  @keyframes u-ping {
+    0% {
+      opacity: 0.8;
+      transform: scale(0.6);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(1.6);
+    }
+  }
+
+  @keyframes u-blink {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0.2;
+    }
+  }
+
+  @keyframes u-fade {
+    0%,
+    100% {
+      opacity: 0.6;
+      transform: translateY(0);
+    }
+    50% {
+      opacity: 0.15;
+      transform: translateY(-6px);
+    }
+  }
+</style>

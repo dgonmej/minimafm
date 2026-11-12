@@ -1,0 +1,294 @@
+---
+import { getNoticias } from '../../lib/api';
+import Layout from '../../layouts/Layout.astro';
+import { formatoFecha, formatoFechaLarga, iso } from '../../lib/format';
+
+const base = import.meta.env.BASE_URL;
+const noticias = (await getNoticias()).sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime());
+
+// Portada: la mas reciente en grande y las siguientes en la columna de "Lo ultimo"
+const [principal, ...resto] = noticias;
+const ultimas = resto.slice(0, 4);
+
+// Secciones del periodico, en este orden; solo las que tienen noticias
+const ordenSecciones = ['La radio', 'Municipio', 'Deportes', 'Cultura', 'Solidaridad'] as const;
+const secciones = ordenSecciones
+  .map((nombre) => ({ nombre, id: nombre.toLowerCase().replace(/\s+/g, '-'), noticias: noticias.filter((n) => n.data.categoria === nombre) }))
+  .filter((s) => s.noticias.length > 0);
+
+const hoy = formatoFechaLarga(new Date());
+const url = (id: string) => `${base}noticias/${id}/`;
+---
+
+<Layout title="Noticias" description="Las noticias de Mínima FM y de la actualidad del Valle de Güímar.">
+  <div class="container">
+    <!-- Cabecera de periodico: titulo, fecha de hoy y secciones -->
+    <header class="masthead">
+      <p class="today">{hoy}</p>
+      <h1 class="page-title">Noticias del Valle</h1>
+      <nav class="sections-nav" aria-label="Secciones">
+        {secciones.map((s) => <a href={`#${s.id}`}>{s.nombre}</a>)}
+      </nav>
+    </header>
+
+    {
+      principal && (
+        <section class="front" aria-label="Portada">
+          <article class="lead">
+            <p class="kicker">{principal.data.categoria}</p>
+            <h2>
+              <a href={url(principal.id)}>{principal.data.titulo}</a>
+            </h2>
+            <p class="lead-summary">{principal.data.resumen}</p>
+            <p class="byline">
+              {principal.data.autor}, <time datetime={iso(principal.data.fecha)}>{formatoFecha(principal.data.fecha)}</time>
+            </p>
+          </article>
+
+          <aside class="latest" aria-labelledby="latest-title">
+            <h2 id="latest-title" class="rail-title">Lo último</h2>
+            <ol>
+              {ultimas.map((n) => (
+                <li>
+                  <p class="kicker small">{n.data.categoria}</p>
+                  <h3>
+                    <a href={url(n.id)}>{n.data.titulo}</a>
+                  </h3>
+                  <time datetime={iso(n.data.fecha)}>{formatoFecha(n.data.fecha)}</time>
+                </li>
+              ))}
+            </ol>
+          </aside>
+        </section>
+      )
+    }
+
+    <!-- Noticias agrupadas por secciones -->
+    {
+      secciones.map((s) => (
+        <section class="section-block" id={s.id} aria-labelledby={`${s.id}-titulo`}>
+          <h2 id={`${s.id}-titulo`} class="section-title">
+            {s.nombre}
+            <span>{s.noticias.length === 1 ? '1 noticia' : `${s.noticias.length} noticias`}</span>
+          </h2>
+          <div class="columns">
+            {s.noticias.map((n) => (
+              <article class="story">
+                <h3>
+                  <a href={url(n.id)}>{n.data.titulo}</a>
+                </h3>
+                <p>{n.data.resumen}</p>
+                <p class="byline">
+                  {n.data.autor}, <time datetime={iso(n.data.fecha)}>{formatoFecha(n.data.fecha)}</time>
+                </p>
+              </article>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</Layout>
+
+<style>
+  /* ---------- Cabecera ---------- */
+  .masthead {
+    display: grid;
+    gap: var(--ui-space-2);
+    padding-block: var(--ui-space-8) var(--ui-space-4);
+    border-bottom: 3px solid var(--ui-color-text);
+  }
+
+  .today {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-subhead);
+  }
+
+  .sections-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-space-1) var(--ui-space-5);
+    margin-top: var(--ui-space-3);
+  }
+
+  .sections-nav a {
+    color: var(--ui-color-text);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .sections-nav a:hover {
+      color: var(--ui-color-primary-text);
+    }
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    h2 a:hover,
+    h3 a:hover {
+      color: var(--ui-color-primary-text);
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+  }
+
+  .kicker {
+    margin: 0;
+    color: var(--ui-color-primary-text);
+    font-size: var(--ui-font-size-subhead);
+    font-weight: 700;
+  }
+
+  .kicker.small {
+    font-size: var(--ui-font-size-footnote);
+  }
+
+  .byline {
+    margin: var(--ui-space-3) 0 0;
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+  }
+
+  /* ---------- Portada ---------- */
+  .front {
+    display: grid;
+    gap: var(--ui-space-8);
+    padding-block: var(--ui-space-8);
+    border-bottom: 1px solid var(--ui-color-separator);
+  }
+
+  @media (min-width: 900px) {
+    .front {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+    .latest {
+      padding-left: var(--ui-space-8);
+      border-left: 1px solid var(--ui-color-separator);
+    }
+  }
+
+  .lead h2 {
+    margin: var(--ui-space-2) 0 0;
+    font-family: var(--ui-font-family-display);
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+
+  .lead-summary {
+    max-width: 34em;
+    margin: var(--ui-space-4) 0 0;
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-title3);
+    line-height: 1.45;
+  }
+
+  .rail-title {
+    margin: 0 0 var(--ui-space-3);
+    padding-bottom: var(--ui-space-2);
+    border-bottom: 2px solid var(--ui-color-primary);
+    font-size: var(--ui-font-size-body);
+    font-weight: 700;
+  }
+
+  .latest ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .latest li {
+    padding-block: var(--ui-space-3);
+  }
+
+  .latest li + li {
+    border-top: 1px solid var(--ui-color-separator);
+  }
+
+  .latest h3 {
+    margin: 2px 0 var(--ui-space-1);
+    font-size: var(--ui-font-size-body);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .latest time {
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+  }
+
+  /* ---------- Secciones ---------- */
+  .section-block {
+    padding-block: var(--ui-space-8) 0;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--ui-space-3);
+    margin: 0 0 var(--ui-space-5);
+    padding-bottom: var(--ui-space-2);
+    border-bottom: 2px solid var(--ui-color-text);
+    font-family: var(--ui-font-family-display);
+    font-size: var(--ui-font-size-title1);
+    font-weight: 700;
+    letter-spacing: var(--ui-letter-spacing-tight);
+  }
+
+  .section-title span {
+    color: var(--ui-color-text-muted);
+    font-family: var(--ui-font-family);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  /* Columnas de periodico separadas por filetes */
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: var(--ui-space-6) var(--ui-space-8);
+  }
+
+  .story {
+    position: relative;
+  }
+
+  @media (min-width: 600px) {
+    .story + .story::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: calc(var(--ui-space-8) / -2);
+      width: 1px;
+      background: var(--ui-color-separator);
+    }
+  }
+
+  .story h3 {
+    margin: 0;
+    font-size: var(--ui-font-size-title3);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+
+  .story p {
+    margin: var(--ui-space-2) 0 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .story .byline {
+    margin-top: var(--ui-space-3);
+  }
+</style>

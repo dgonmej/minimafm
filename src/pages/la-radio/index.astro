@@ -1,0 +1,479 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import { getEquipo, getHistoria, getProgramas, getRadio } from '../../lib/api';
+
+const base = import.meta.env.BASE_URL;
+
+const [radio, programas, historia, equipoFijo] = await Promise.all([getRadio(), getProgramas(), getHistoria(), getEquipo()]);
+
+// Presentadores sacados de la parrilla, con sus programas
+const presentadores = [...new Set(programas.map((p) => p.presentador))]
+  .filter((n) => n !== 'Equipo de redacción')
+  .map((nombre) => ({
+    nombre,
+    programas: programas.filter((p) => p.presentador === nombre),
+  }));
+
+// Posicion del 97.9 en el dial de FM (87,5 a 108 MHz)
+const posicionDial = ((Number(radio.frecuencia) - 87.5) / (108 - 87.5)) * 100;
+const marcas = [88, 92, 96, 100, 104, 108];
+const tel = (n: string) => n.replace(/\s/g, '');
+---
+
+<Layout title="La radio" description="Quiénes somos: la historia, el equipo y cómo escuchar Mínima FM en el Valle de Güímar.">
+  <!-- Apertura: declaracion y dial de FM -->
+  <section class="container intro">
+    <p class="eyebrow">La radio</p>
+    <h1>Una radio pequeña para un valle con mucho que contar.</h1>
+    <p class="intro-text">
+      Mínima FM es una emisora local, sin ánimo de lucro, hecha por vecinos del Valle de Güímar. Desde 1998 contamos lo
+      que pasa en Güímar, Arafo y Candelaria y ponemos la música que nos pedís.
+    </p>
+
+    <div class="dial" role="img" aria-label={`Dial de FM sintonizado en el ${radio.frecuencia}`}>
+      <div class="scale">
+        {marcas.map((m) => <span style={`left: ${((m - 87.5) / 20.5) * 100}%`}>{m}</span>)}
+      </div>
+      <div class="needle" style={`left: ${posicionDial}%`}>
+        <span>{radio.frecuencia}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Historia: recorrido horizontal por los anos -->
+  <section class="history" aria-labelledby="historia">
+    <div class="container">
+      <h2 id="historia" class="title">Nuestra historia</h2>
+    </div>
+    <ol class="years" tabindex="0" aria-label="Años de historia">
+      {
+        historia.map((h) => (
+          <li>
+            <span class="year">{h.anio}</span>
+            <h3>{h.titulo}</h3>
+            <p>{h.texto}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <!-- Equipo -->
+  <section class="container team-section" aria-labelledby="equipo">
+    <div class="team-head">
+      <h2 id="equipo" class="title">Quién hace la radio</h2>
+      <p>Todas las voces de Mínima FM son vecinos del Valle. Si te apetece hacer radio, aquí hay sitio.</p>
+    </div>
+    <ul class="team">
+      {
+        equipoFijo.map((p) => (
+          <li>
+            <dgonmej-ui-avatar size="xl" name={p.nombre}></dgonmej-ui-avatar>
+            <strong>{p.nombre}</strong>
+            <span>{p.papel}</span>
+          </li>
+        ))
+      }
+      {
+        presentadores.map((p) => (
+          <li>
+            <dgonmej-ui-avatar size="xl" name={p.nombre}></dgonmej-ui-avatar>
+            <strong>{p.nombre}</strong>
+            <span>
+              {p.programas.map((pr, i) => (
+                <>
+                  <a href={`${base}programas/${pr.id}/`}>{pr.nombre}</a>
+                  {i < p.programas.length - 1 ? ' y ' : ''}
+                </>
+              ))}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- Como escucharnos -->
+  <section class="container listen" aria-labelledby="escuchar">
+    <h2 id="escuchar" class="title">Cómo escucharnos</h2>
+    <div class="ways">
+      <div class="way">
+        <dgonmej-ui-icon name="radio" size="28"></dgonmej-ui-icon>
+        <h3>En el {radio.frecuencia} de la FM</h3>
+        <p>Desde Güímar, Arafo y Candelaria, y en buena parte de la costa entre El Tablero y Fasnia.</p>
+      </div>
+      <div class="way">
+        <Icon name="globe" size={28} />
+        <h3>En esta web</h3>
+        <p>Dale al play en la barra de abajo: la radio sigue sonando mientras navegas.</p>
+        <dgonmej-ui-button id="listen-here" variant="primary" size="small">
+          <dgonmej-ui-icon name="play" size="16"></dgonmej-ui-icon><span class="listen-label">Escuchar ahora</span>
+        </dgonmej-ui-button>
+      </div>
+      <div class="way">
+        <Icon name="smartphone" size={28} />
+        <h3>En el móvil</h3>
+        <p>Abre la web en el navegador y añádela a la pantalla de inicio para tenernos a un toque.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visitanos -->
+  <section class="container visit" aria-labelledby="visitanos">
+    <div>
+      <h2 id="visitanos" class="title">Ven a vernos</h2>
+      <p>
+        El estudio está en la plaza de San Pedro, en pleno casco de Güímar. Si pasas por delante y estamos en directo,
+        saluda por el cristal.
+      </p>
+    </div>
+    <ul class="contact">
+      <li><Icon name="map-pin" /><span>{radio.direccion}</span></li>
+      <li><Icon name="phone" /><a href={`tel:${tel(radio.telefono)}`}>{radio.telefono}</a></li>
+      <li><Icon name="mail" /><a href={`mailto:${radio.correo}`}>{radio.correo}</a></li>
+    </ul>
+  </section>
+</Layout>
+
+<script>
+  // "Escuchar ahora" controla el reproductor fijo de abajo
+  const setup = () => {
+    const button = document.getElementById('listen-here');
+    const player = document.getElementById('player') as (HTMLElement & { toggle: () => void }) | null;
+    if (!button || !player) return;
+    const label = button.querySelector('.listen-label')!;
+    const icon = button.querySelector('dgonmej-ui-icon')!;
+    const sync = () => {
+      const playing = player.hasAttribute('playing');
+      label.textContent = playing ? 'Pausar' : 'Escuchar ahora';
+      icon.setAttribute('name', playing ? 'pause' : 'play');
+    };
+    button.addEventListener('ui-click', () => player.toggle());
+    player.addEventListener('ui-play', sync);
+    player.addEventListener('ui-pause', sync);
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        player.removeEventListener('ui-play', sync);
+        player.removeEventListener('ui-pause', sync);
+      },
+      { once: true }
+    );
+    sync();
+  };
+  document.addEventListener('astro:page-load', setup);
+</script>
+
+<style>
+  .title {
+    margin: 0 0 var(--ui-space-5);
+    font-family: var(--ui-font-family-display);
+    font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+    font-weight: 700;
+    letter-spacing: var(--ui-letter-spacing-tight);
+    line-height: 1.1;
+  }
+
+  /* ---------- Apertura ---------- */
+  .intro {
+    padding-block: calc(var(--ui-space-8) * 1.5) var(--ui-space-8);
+  }
+
+  .eyebrow {
+    margin: 0 0 var(--ui-space-3);
+    color: var(--ui-color-primary-text);
+    font-weight: 700;
+  }
+
+  h1 {
+    max-width: 16em;
+    margin: 0;
+    font-family: var(--ui-font-family-display);
+    font-size: clamp(2.25rem, 6vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+  }
+
+  .intro-text {
+    max-width: 38em;
+    margin: var(--ui-space-5) 0 0;
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-title3);
+    line-height: 1.5;
+  }
+
+  /* Dial de FM: escala con marcas y la aguja en el 97.9 */
+  .dial {
+    position: relative;
+    height: 96px;
+    margin-top: calc(var(--ui-space-8) * 1.5);
+    border-radius: var(--ui-radius-lg);
+    background:
+      repeating-linear-gradient(90deg, var(--ui-color-separator) 0 1px, transparent 1px 2.439%) 0 0 / 100% 22px no-repeat,
+      linear-gradient(180deg, var(--ui-color-surface), var(--ui-color-surface));
+    box-shadow:
+      inset 0 0 0 1px var(--ui-color-border),
+      var(--ui-shadow-sm);
+    overflow: hidden;
+  }
+
+  .scale span {
+    position: absolute;
+    top: 30px;
+    translate: -50% 0;
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .scale span:first-child {
+    translate: 0 0;
+  }
+
+  .scale span:last-child {
+    translate: -110% 0;
+  }
+
+  .needle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    translate: -50% 0;
+    background: var(--site-live);
+    box-shadow: 0 0 16px var(--site-live);
+  }
+
+  .needle span {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    translate: -50% 0;
+    padding: 2px 10px;
+    border-radius: var(--ui-radius-control);
+    color: #fff;
+    background: var(--brand-sunset);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* ---------- Historia ---------- */
+  .history {
+    padding-block: var(--ui-space-8);
+    background: var(--ui-color-surface);
+    box-shadow:
+      inset 0 1px 0 var(--ui-color-separator),
+      inset 0 -1px 0 var(--ui-color-separator);
+  }
+
+  .years {
+    --gutter: max(var(--ui-space-4), (100vw - var(--site-max)) / 2 + var(--ui-space-4));
+    display: grid;
+    grid-auto-columns: minmax(240px, 300px);
+    grid-auto-flow: column;
+    gap: var(--ui-space-6);
+    margin: 0;
+    padding: var(--ui-space-2) var(--gutter) var(--ui-space-4);
+    overflow-x: auto;
+    list-style: none;
+    scroll-padding-inline: var(--gutter);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+
+  .years li {
+    position: relative;
+    padding-top: var(--ui-space-5);
+    border-top: 2px solid var(--ui-color-separator);
+    scroll-snap-align: start;
+  }
+
+  /* Punto sobre la linea del tiempo */
+  .years li::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--ui-color-primary);
+    box-shadow: 0 0 0 4px var(--ui-color-surface);
+  }
+
+  .year {
+    display: block;
+    color: var(--ui-color-primary-text);
+    font-family: var(--ui-font-family-display);
+    font-size: var(--ui-font-size-title1);
+    font-weight: 700;
+    letter-spacing: var(--ui-letter-spacing-tight);
+  }
+
+  .years h3 {
+    margin: var(--ui-space-1) 0 var(--ui-space-2);
+    font-size: var(--ui-font-size-title3);
+    font-weight: 700;
+  }
+
+  .years p {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  /* ---------- Equipo ---------- */
+  .team-section {
+    padding-block: calc(var(--ui-space-8) * 1.5) var(--ui-space-8);
+  }
+
+  .team-head p {
+    max-width: 36em;
+    margin: calc(var(--ui-space-3) * -1) 0 var(--ui-space-6);
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-title3);
+  }
+
+  .team {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr));
+    gap: var(--ui-space-8) var(--ui-space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .team li {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    text-align: center;
+  }
+
+  .team dgonmej-ui-avatar {
+    margin-bottom: var(--ui-space-3);
+  }
+
+  .team span {
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-subhead);
+  }
+
+  .team a {
+    color: var(--ui-color-primary-text);
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .team a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  /* ---------- Como escucharnos ---------- */
+  .listen {
+    padding-block: var(--ui-space-8);
+  }
+
+  .ways {
+    display: grid;
+    gap: 1px;
+    overflow: hidden;
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-color-separator);
+    box-shadow: inset 0 0 0 1px var(--ui-color-border);
+  }
+
+  @media (min-width: 760px) {
+    .ways {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .way {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: var(--ui-space-2);
+    padding: var(--ui-space-6);
+    background: var(--ui-color-surface);
+  }
+
+  .way > :global(.icon),
+  .way > dgonmej-ui-icon {
+    margin-bottom: var(--ui-space-2);
+    color: var(--ui-color-primary-text);
+  }
+
+  .way h3 {
+    margin: 0;
+    font-size: var(--ui-font-size-title3);
+    font-weight: 700;
+  }
+
+  .way p {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .way dgonmej-ui-button {
+    margin-top: var(--ui-space-3);
+  }
+
+  /* ---------- Visitanos ---------- */
+  .visit {
+    display: grid;
+    gap: var(--ui-space-6);
+    padding-block: var(--ui-space-8);
+  }
+
+  @media (min-width: 760px) {
+    .visit {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .visit p {
+    max-width: 32em;
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .contact {
+    display: grid;
+    gap: var(--ui-space-4);
+    margin: 0;
+    padding: var(--ui-space-6);
+    list-style: none;
+    border-left: 3px solid var(--ui-color-primary);
+    font-size: var(--ui-font-size-title3);
+    font-weight: 600;
+  }
+
+  .contact li {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: var(--ui-space-3);
+    align-items: start;
+    overflow-wrap: anywhere;
+  }
+
+  .contact :global(.icon) {
+    margin-top: 4px;
+    color: var(--ui-color-primary-text);
+  }
+
+  .contact a {
+    color: var(--ui-color-text);
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .contact a:hover {
+      color: var(--ui-color-primary-text);
+      text-decoration: underline;
+    }
+  }
+</style>

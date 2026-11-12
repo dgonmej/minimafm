@@ -1,0 +1,399 @@
+---
+import { getEventos, type Evento } from '../../lib/api';
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import { formatoFecha, formatoFechaLarga, iconoEvento, iso } from '../../lib/format';
+
+const base = import.meta.env.BASE_URL;
+const hoy = new Date(new Date().toDateString());
+const todos = (await getEventos()).sort((a, b) => a.data.fecha.getTime() - b.data.fecha.getTime());
+const proximos = todos.filter((e) => e.data.fecha >= hoy);
+const pasados = todos.filter((e) => e.data.fecha < hoy).reverse();
+
+// Agenda agrupada por meses
+const tz = 'Atlantic/Canary';
+const mes = new Intl.DateTimeFormat('es-ES', { month: 'long', timeZone: tz });
+const anio = new Intl.DateTimeFormat('es-ES', { year: 'numeric', timeZone: tz });
+const diaSemana = new Intl.DateTimeFormat('es-ES', { weekday: 'short', timeZone: tz });
+const diaMes = new Intl.DateTimeFormat('es-ES', { day: 'numeric', timeZone: tz });
+const mayuscula = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+const meses = new Map<string, { id: string; nombre: string; anio: string; eventos: Evento[] }>();
+for (const e of proximos) {
+  const id = `mes-${iso(e.data.fecha).slice(0, 7)}`;
+  if (!meses.has(id)) {
+    meses.set(id, { id, nombre: mayuscula(mes.format(e.data.fecha)), anio: anio.format(e.data.fecha), eventos: [] });
+  }
+  meses.get(id)!.eventos.push(e);
+}
+const grupos = [...meses.values()];
+const plural = (n: number) => (n === 1 ? '1 evento' : `${n} eventos`);
+---
+
+<Layout title="Eventos" description="Agenda de fiestas, mercados, conciertos y actividades en el Valle de Güímar.">
+  <div class="container">
+    <header class="page-head">
+      <h1 class="page-title">Agenda del Valle</h1>
+      <p class="page-intro">Fiestas, mercados, conciertos y actividades en el Valle de Güímar. ¿Organizas algo? Cuéntanoslo.</p>
+    </header>
+
+    {
+      grupos.length > 0 && (
+        <nav class="months" aria-label="Meses de la agenda">
+          {grupos.map((g) => (
+            <a href={`#${g.id}`}>
+              <strong>{g.nombre}</strong> {g.anio}
+              <span>{plural(g.eventos.length)}</span>
+            </a>
+          ))}
+        </nav>
+      )
+    }
+
+    {
+      grupos.length === 0 && (
+        <p class="empty">Ahora mismo no hay eventos en la agenda. Vuelve pronto o escúchanos para enterarte de las novedades.</p>
+      )
+    }
+
+    <div class="agenda">
+      {
+        grupos.map((g) => (
+          <section class="month" id={g.id} aria-labelledby={`${g.id}-titulo`}>
+            <h2 id={`${g.id}-titulo`} class="month-title">
+              {g.nombre} <span class="year">{g.anio}</span>
+              <span class="count">{plural(g.eventos.length)}</span>
+            </h2>
+            <ol class="rows">
+              {g.eventos.map((e) => (
+                <li>
+                  <a class="row" href={`${base}eventos/${e.id}/`}>
+                    <time class="date" datetime={iso(e.data.fecha)} aria-label={formatoFechaLarga(e.data.fecha)}>
+                      <span class="weekday">{diaSemana.format(e.data.fecha).replace('.', '')}</span>
+                      <span class="day">{diaMes.format(e.data.fecha)}</span>
+                    </time>
+                    <div class="body">
+                      <p class="category">
+                        <Icon name={iconoEvento[e.data.categoria]} size={16} />
+                        {e.data.categoria}
+                      </p>
+                      <h3>{e.data.titulo}</h3>
+                      <p class="summary">{e.data.resumen}</p>
+                      <p class="meta">
+                        <span><Icon name="clock" size={16} />{e.data.hora}</span>
+                        <span><Icon name="map-pin" size={16} />{e.data.lugar}</span>
+                      </p>
+                    </div>
+                    <dgonmej-ui-icon class="chevron" name="chevron-right" size="20" />
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ))
+      }
+    </div>
+
+    {
+      pasados.length > 0 && (
+        <details class="past">
+          <summary>Eventos pasados ({pasados.length})</summary>
+          <ul>
+            {pasados.map((e) => (
+              <li>
+                <a href={`${base}eventos/${e.id}/`}>{e.data.titulo}</a>
+                <time datetime={iso(e.data.fecha)}>{formatoFecha(e.data.fecha)}</time>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )
+    }
+  </div>
+</Layout>
+
+<script>
+  // Marca el titulo del mes que esta fijo arriba, para darle fondo y sombra solo entonces
+  const setup = () => {
+    const titles = [...document.querySelectorAll<HTMLElement>('.month-title')];
+    if (!titles.length) return;
+    const nav = document.querySelector<HTMLElement>('.site-nav');
+    const update = () => {
+      const top = nav?.offsetHeight ?? 64;
+      document.documentElement.style.setProperty('--nav-height', `${top}px`);
+      titles.forEach((t) => {
+        const section = t.parentElement!.getBoundingClientRect();
+        const stuck = t.getBoundingClientRect().top <= top + 1 && section.top < top;
+        t.classList.toggle('stuck', stuck);
+      });
+    };
+    let frame = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        window.removeEventListener('scroll', onScroll);
+        window.removeEventListener('resize', onScroll);
+      },
+      { once: true }
+    );
+  };
+  document.addEventListener('astro:page-load', setup);
+</script>
+
+<style>
+  /* Indice de meses */
+  .months {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-space-2);
+    margin-bottom: var(--ui-space-8);
+  }
+
+  .months a {
+    display: grid;
+    padding: var(--ui-space-3) var(--ui-space-4);
+    border-radius: var(--ui-radius-md);
+    color: var(--ui-color-text);
+    background: var(--ui-color-surface);
+    box-shadow: inset 0 0 0 1px var(--ui-color-border);
+    text-decoration: none;
+    line-height: 1.3;
+    transition: transform var(--ui-duration-fast) var(--ui-ease-standard);
+  }
+
+  .months a span {
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+  }
+
+  @media (hover: hover) {
+    .months a:hover {
+      box-shadow: inset 0 0 0 1px var(--ui-color-primary);
+    }
+  }
+
+  .months a:active {
+    transform: scale(0.97);
+  }
+
+  .agenda {
+    display: grid;
+    gap: var(--ui-space-8);
+    max-width: 880px;
+  }
+
+  /*
+   * Titulo del mes fijo arriba mientras se recorre ese mes. Es una barra de cristal algo mas
+   * ancha que la lista (el texto queda alineado con ella) para taparla del todo al pasar por debajo.
+   */
+  .month-title {
+    position: sticky;
+    top: var(--nav-height, 64px);
+    z-index: 2;
+    display: flex;
+    align-items: baseline;
+    gap: var(--ui-space-2);
+    margin: 0 calc(var(--ui-space-3) * -1) var(--ui-space-3);
+    padding: var(--ui-space-3);
+    border-radius: var(--ui-radius-lg);
+    font-family: var(--ui-font-family-display);
+    font-size: var(--ui-font-size-title1);
+    font-weight: 700;
+    letter-spacing: var(--ui-letter-spacing-tight);
+    transition:
+      background-color var(--ui-duration-base) var(--ui-ease-standard),
+      box-shadow var(--ui-duration-base) var(--ui-ease-standard);
+  }
+
+  /* Al quedarse fijo: material translucido, borde fino y sombra */
+  .month-title.stuck {
+    background: var(--ui-material-bg);
+    box-shadow:
+      inset 0 0 0 1px var(--ui-color-border),
+      var(--ui-shadow-md);
+  }
+
+  @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+    .month-title.stuck {
+      background: var(--ui-material-bg-translucent);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      backdrop-filter: blur(20px) saturate(180%);
+    }
+  }
+
+  .year {
+    color: var(--ui-color-text-muted);
+    font-weight: 400;
+  }
+
+  .count {
+    margin-left: auto;
+    color: var(--ui-color-text-muted);
+    font-family: var(--ui-font-family);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 600;
+    letter-spacing: 0;
+  }
+
+  /* Filas de agenda dentro de una sola superficie */
+  .rows {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    list-style: none;
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-color-surface);
+    box-shadow:
+      inset 0 0 0 1px var(--ui-color-border),
+      var(--ui-shadow-sm);
+  }
+
+  .rows li + li {
+    border-top: 1px solid var(--ui-color-separator);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    gap: var(--ui-space-4);
+    align-items: start;
+    padding: var(--ui-space-5);
+    color: var(--ui-color-text);
+    text-decoration: none;
+    transition: background-color var(--ui-duration-fast) var(--ui-ease-standard);
+  }
+
+  @media (hover: hover) {
+    .row:hover {
+      background: var(--ui-color-surface-hover);
+    }
+  }
+
+  .row:focus-visible {
+    outline-offset: -3px;
+  }
+
+  .date {
+    display: grid;
+    justify-items: center;
+    padding: var(--ui-space-2) 0;
+    border-radius: var(--ui-radius-md);
+    color: var(--brand-mango-ink);
+    background: var(--brand-mango);
+    line-height: 1.1;
+  }
+
+  .weekday {
+    font-size: var(--ui-font-size-caption);
+    font-weight: 700;
+  }
+
+  .day {
+    font-size: var(--ui-font-size-title1);
+    font-weight: 700;
+  }
+
+  .category {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    color: var(--ui-color-primary-text);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 600;
+  }
+
+  h3 {
+    margin: var(--ui-space-1) 0;
+    font-size: var(--ui-font-size-title3);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .summary {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-space-1) var(--ui-space-4);
+    margin: var(--ui-space-3) 0 0;
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 600;
+  }
+
+  .meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .meta :global(.icon) {
+    color: var(--ui-color-text-muted);
+  }
+
+  .chevron {
+    align-self: center;
+    color: var(--ui-color-text-muted);
+  }
+
+  @media (max-width: 479px) {
+    .row {
+      grid-template-columns: 56px minmax(0, 1fr);
+      padding: var(--ui-space-4);
+    }
+    .chevron {
+      display: none;
+    }
+  }
+
+  .empty {
+    padding: var(--ui-space-8);
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-color-surface);
+    color: var(--ui-color-text-muted);
+    text-align: center;
+  }
+
+  .past {
+    max-width: 880px;
+    margin-top: calc(var(--ui-space-8) * 1.5);
+    padding: var(--ui-space-4) var(--ui-space-5);
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-color-fill);
+  }
+
+  .past summary {
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .past ul {
+    display: grid;
+    gap: var(--ui-space-2);
+    margin: var(--ui-space-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .past li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--ui-space-2);
+  }
+
+  .past time {
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+  }
+</style>

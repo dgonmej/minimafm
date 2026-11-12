@@ -1,0 +1,192 @@
+---
+/*
+ * Ficha ancha de un programa para la pagina de Programas: franja de color segun el tipo,
+ * presentador, descripcion, secciones y horario. Si esta sonando, se marca "En antena".
+ */
+import Icon from './Icon.astro';
+import { describirFranja, iconoPrograma, tonoPrograma } from '../lib/format';
+import type { Programa } from '../data/radio';
+
+interface Props {
+  programa: Programa;
+}
+
+const { programa } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const ficha = `${base}programas/${programa.id}/`;
+---
+
+<dgonmej-ui-card class="feature" id={programa.id} layout="horizontal" data-program={programa.id}>
+  <div slot="media" class:list={['panel', tonoPrograma[programa.categoria]]} aria-hidden="true">
+    <Icon name={iconoPrograma[programa.categoria]} size={56} />
+  </div>
+
+  <div slot="header" class="host">
+    <dgonmej-ui-avatar size="md" name={programa.presentador}></dgonmej-ui-avatar>
+    <span>
+      <span class="host-label">Presenta</span>
+      <strong>{programa.presentador}</strong>
+    </span>
+    <dgonmej-ui-badge class="on-air" variant="danger" dot size="small" hidden>En antena</dgonmej-ui-badge>
+  </div>
+
+  <p class="category">
+    <Icon name={iconoPrograma[programa.categoria]} size={16} />
+    {programa.categoria}
+  </p>
+  <h2><a href={ficha}>{programa.nombre}</a></h2>
+  <p class="text">{programa.descripcion}</p>
+
+  <h3 class="sub">En el programa</h3>
+  <div class="tags">
+    {programa.secciones.map((s) => <dgonmej-ui-badge>{s}</dgonmej-ui-badge>)}
+  </div>
+
+  <div slot="footer" class="footer">
+    <ul class="slots">
+      {
+        programa.franjas.map((f) => (
+          <li>
+            <Icon name="clock" size={16} />
+            {describirFranja(f)}
+          </li>
+        ))
+      }
+    </ul>
+    <dgonmej-ui-button variant="ghost" size="small" href={ficha}>
+      Ver el programa<dgonmej-ui-icon name="chevron-right" size="16"></dgonmej-ui-icon>
+    </dgonmej-ui-button>
+  </div>
+</dgonmej-ui-card>
+
+<style>
+  .feature {
+    height: 100%;
+  }
+
+  @media (min-width: 600px) {
+    .feature::part(media) {
+      flex-basis: 28%;
+    }
+  }
+
+  /* Franja de color segun el tipo de programa (colores del logo) */
+  .panel {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    min-height: 112px;
+    aspect-ratio: auto;
+    color: #fff;
+  }
+
+  .panel :global(.icon) {
+    opacity: 0.9;
+    filter: drop-shadow(0 4px 12px rgb(0 0 0 / 0.2));
+  }
+
+
+  .host {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-3);
+    width: 100%;
+  }
+
+  .host > span {
+    display: grid;
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  .host-label {
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-caption);
+    font-weight: 400;
+  }
+
+  .host strong {
+    font-size: var(--ui-font-size-subhead);
+  }
+
+  .on-air[hidden] {
+    display: none;
+  }
+
+  .category {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    color: var(--ui-color-primary-text);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 600;
+  }
+
+  h2 {
+    margin: var(--ui-space-1) 0 var(--ui-space-2);
+    font-family: var(--ui-font-family-display);
+    font-size: var(--ui-font-size-title2);
+    font-weight: 700;
+    letter-spacing: var(--ui-letter-spacing-tight);
+    line-height: 1.15;
+  }
+
+  h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    h2 a:hover {
+      color: var(--ui-color-primary-text);
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 4px;
+    }
+  }
+
+  .text {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .sub {
+    margin: var(--ui-space-4) 0 var(--ui-space-2);
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 600;
+  }
+
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ui-space-2) var(--ui-space-4);
+    width: 100%;
+    padding-top: var(--ui-space-3);
+    border-top: 1px solid var(--ui-color-separator);
+  }
+
+  .slots {
+    display: grid;
+    gap: var(--ui-space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 600;
+  }
+
+  .slots li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .slots :global(.icon) {
+    flex: none;
+    color: var(--ui-color-primary-text);
+  }
+</style>

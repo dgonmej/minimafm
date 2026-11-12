@@ -1,0 +1,198 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import Schedule from '../components/Schedule.astro';
+import ProgramCard from '../components/ProgramCard.astro';
+import EventCard from '../components/EventCard.astro';
+import NewsCard from '../components/NewsCard.astro';
+import Icon from '../components/Icon.astro';
+import { getEventos, getNoticias, getProgramas, getRadio } from '../lib/api';
+
+const [radio, programas, todosEventos, todasNoticias] = await Promise.all([getRadio(), getProgramas(), getEventos(), getNoticias()]);
+
+const base = import.meta.env.BASE_URL;
+const hoy = new Date(new Date().toDateString());
+
+// Proximos eventos
+const eventos = todosEventos
+  .filter((e) => e.data.fecha >= hoy)
+  .sort((a, b) => a.data.fecha.getTime() - b.data.fecha.getTime())
+  .slice(0, 3);
+
+const [destacada, ...otras] = todasNoticias
+  .sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime())
+  .slice(0, 3);
+
+// Cuatro programas destacados: los de esta lista y, si falta alguno, los primeros del resto
+const preferidos = ['buenos-dias-valle', 'raices', 'voces-del-valle', 'sabado-de-parranda'];
+const destacados = [
+  ...preferidos.map((id) => programas.find((p) => p.id === id)).filter((p) => p !== undefined),
+  ...programas.filter((p) => !preferidos.includes(p.id)),
+].slice(0, 4);
+
+const tel = (n: string) => n.replace(/\s/g, '');
+---
+
+<Layout>
+  <Hero />
+
+  <!-- Hoy en la radio -->
+  <section class="section container" aria-labelledby="today-title">
+    <div class="today">
+      <div>
+        <div class="section-head">
+          <div>
+            <h2 id="today-title">Hoy en Mínima FM</h2>
+            <p>La programación de hoy, en hora de Canarias.</p>
+          </div>
+          <dgonmej-ui-button variant="secondary" href={`${base}horarios/`}>Toda la semana</dgonmej-ui-button>
+        </div>
+        <Schedule soloHoy />
+      </div>
+
+      <aside class="join" aria-labelledby="join-title">
+        <Icon name="mic" size={28} />
+        <h2 id="join-title">La radio la hacéis vosotros</h2>
+        <p>Pide tu canción, manda una felicitación o cuéntanos lo que pasa en tu barrio.</p>
+        <div class="join-actions">
+          <dgonmej-ui-button variant="primary" block href={`https://wa.me/34${tel(radio.whatsapp)}`} target="_blank">
+            <Icon name="message-circle" />Escríbenos por WhatsApp
+          </dgonmej-ui-button>
+          <dgonmej-ui-button variant="secondary" block href={`tel:${tel(radio.telefono)}`}>
+            <Icon name="phone" />Llama al {radio.telefono}
+          </dgonmej-ui-button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Programas -->
+  <section class="section container" aria-labelledby="programs-title">
+    <div class="section-head">
+      <div>
+        <h2 id="programs-title">Nuestros programas</h2>
+        <p>Información, tradición, deporte y mucha música, hechos en el Valle.</p>
+      </div>
+      <dgonmej-ui-button variant="secondary" href={`${base}programas/`}>Todos los programas</dgonmej-ui-button>
+    </div>
+    <ul class="grid-cards grid-4">
+      {destacados.map((p) => <li><ProgramCard programa={p} /></li>)}
+    </ul>
+  </section>
+
+  <!-- Eventos -->
+  <section class="section container" aria-labelledby="events-title">
+    <div class="section-head">
+      <div>
+        <h2 id="events-title">Próximos eventos</h2>
+        <p>Lo que se mueve en el Valle en las próximas semanas.</p>
+      </div>
+      <dgonmej-ui-button variant="secondary" href={`${base}eventos/`}>Toda la agenda</dgonmej-ui-button>
+    </div>
+    <ul class="grid-cards">
+      {eventos.map((e) => <li><EventCard evento={e} /></li>)}
+    </ul>
+  </section>
+
+  <!-- Noticias -->
+  <section class="section container" aria-labelledby="news-title">
+    <div class="section-head">
+      <div>
+        <h2 id="news-title">Últimas noticias</h2>
+        <p>La actualidad de la radio y del municipio.</p>
+      </div>
+      <dgonmej-ui-button variant="secondary" href={`${base}noticias/`}>Todas las noticias</dgonmej-ui-button>
+    </div>
+    <div class="news">
+      {destacada && <NewsCard noticia={destacada} destacada />}
+      <div class="news-side">
+        {otras.map((n) => <NewsCard noticia={n} />)}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .today {
+    display: grid;
+    /* La columna se ajusta al ancho disponible, no al boton mas largo */
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ui-space-6);
+    align-items: start;
+  }
+
+  @media (min-width: 900px) {
+    .today {
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    }
+  }
+
+  /* Tarjeta para participar, con el degradado del logo de fondo muy suave */
+  .join {
+    display: grid;
+    gap: var(--ui-space-3);
+    padding: var(--ui-space-6);
+    border-radius: var(--ui-radius-lg);
+    background:
+      radial-gradient(80% 80% at 100% 0%, rgb(245 166 35 / 0.18), transparent 70%),
+      radial-gradient(70% 70% at 0% 100%, rgb(163 36 91 / 0.12), transparent 70%),
+      var(--ui-color-surface);
+    box-shadow:
+      inset 0 0 0 1px var(--ui-color-border),
+      var(--ui-shadow-sm);
+  }
+
+  @media (min-width: 900px) {
+    .join {
+      position: sticky;
+      top: 88px;
+    }
+  }
+
+  .join > :global(.icon) {
+    color: var(--ui-color-primary-text);
+  }
+
+  .join h2 {
+    margin: 0;
+    font-family: var(--ui-font-family-display);
+    font-size: var(--ui-font-size-title2);
+    font-weight: 700;
+    letter-spacing: var(--ui-letter-spacing-tight);
+  }
+
+  .join p {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .join-actions {
+    display: grid;
+    gap: var(--ui-space-2);
+    margin-top: var(--ui-space-2);
+  }
+
+  /* En pantallas muy estrechas el texto de los botones puede partirse */
+  @media (max-width: 374px) {
+    .join-actions dgonmej-ui-button::part(control) {
+      white-space: normal;
+      text-align: center;
+    }
+  }
+
+  .news {
+    display: grid;
+    gap: var(--ui-space-5);
+  }
+
+  @media (min-width: 900px) {
+    .news {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    }
+  }
+
+  .news-side {
+    display: grid;
+    gap: var(--ui-space-5);
+  }
+</style>

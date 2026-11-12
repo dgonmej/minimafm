@@ -1,0 +1,260 @@
+---
+import { dias } from '../data/radio';
+import { emisionesDelDia } from '../lib/schedule';
+import { getProgramas } from '../lib/api';
+
+interface Props {
+  /** Solo el dia de hoy (portada) o la semana entera (pagina de horarios) */
+  soloHoy?: boolean;
+}
+
+const { soloHoy = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const programas = await getProgramas();
+const semana = dias.map((nombre, i) => ({ nombre, i, emisiones: emisionesDelDia(i, programas) }));
+const opciones = dias.map((nombre, i) => ({ value: String(i), label: nombre.slice(0, 3) }));
+---
+
+<div class="schedule" data-schedule data-solo-hoy={soloHoy ? 'true' : undefined}>
+  {
+    !soloHoy && (
+      <dgonmej-ui-segmented-control
+        class="days"
+        label="Día de la semana"
+        value="0"
+        data-options={JSON.stringify(opciones)}
+      />
+    )
+  }
+
+  {
+    semana.map((d) => (
+      <section class="day" data-day={d.i} aria-labelledby={`dia-${d.i}`}>
+        <h3 id={`dia-${d.i}`} class="day-title">
+          {d.nombre}
+          <span class="today-badge" hidden>
+            Hoy
+          </span>
+        </h3>
+        <ol class="slots">
+          {d.emisiones.map((e) => (
+            <li class="slot" data-inicio={e.inicio} data-fin={e.fin}>
+              <time class="time">
+                {e.inicio}
+                <span class="end">{e.fin}</span>
+              </time>
+              <div class="info">
+                <a class="name" href={`${base}programas/${e.programa.id}/`}>
+                  {e.programa.nombre}
+                </a>
+                <span class="host">{e.programa.presentador}</span>
+                <div class="live" hidden>
+                  <dgonmej-ui-badge variant="danger" dot size="small">
+                    En antena
+                  </dgonmej-ui-badge>
+                  <dgonmej-ui-progress size="thin" tone="danger" label="Tiempo emitido" />
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p class="filler">El resto del día, música continua.</p>
+      </section>
+    ))
+  }
+</div>
+
+<script>
+  import { ahoraEnCanarias } from '../lib/schedule';
+
+  const minutos = (h: string) => {
+    const [hh, mm] = h.split(':').map(Number);
+    return hh * 60 + mm;
+  };
+
+  // Muestra el dia elegido (o el de hoy) y marca lo que suena ahora
+  const setup = () => {
+    document.querySelectorAll<HTMLElement>('[data-schedule]').forEach((schedule) => {
+      const days = [...schedule.querySelectorAll<HTMLElement>('.day')];
+      const control = schedule.querySelector('.days') as (HTMLElement & { options: unknown; value: string }) | null;
+      const soloHoy = schedule.dataset.soloHoy === 'true';
+
+      const show = (day: number) => {
+        days.forEach((el) => (el.hidden = Number(el.dataset.day) !== day));
+      };
+
+      const markNow = () => {
+        const { dia, minuto } = ahoraEnCanarias();
+        days.forEach((el) => {
+          const isToday = Number(el.dataset.day) === dia;
+          el.querySelector<HTMLElement>('.today-badge')!.hidden = !isToday;
+          el.querySelectorAll<HTMLElement>('.slot').forEach((slot) => {
+            const inicio = minutos(slot.dataset.inicio!);
+            const fin = minutos(slot.dataset.fin!);
+            const live = isToday && inicio <= minuto && minuto < fin;
+            slot.classList.toggle('on-air', live);
+            const box = slot.querySelector<HTMLElement>('.live')!;
+            box.hidden = !live;
+            if (live) {
+              const progress = box.querySelector('dgonmej-ui-progress') as HTMLElement & { value: number };
+              progress.value = Math.round(((minuto - inicio) / (fin - inicio)) * 100);
+            }
+          });
+        });
+        return dia;
+      };
+
+      const today = markNow();
+      if (!schedule.dataset.ready) {
+        schedule.dataset.ready = 'true';
+        if (control) {
+          customElements.whenDefined('dgonmej-ui-segmented-control').then(() => {
+            control.options = JSON.parse(control.dataset.options ?? '[]');
+            control.value = String(today);
+          });
+          control.addEventListener('ui-change', (e) => show(Number((e as CustomEvent<{ value: string }>).detail.value)));
+        }
+        setInterval(markNow, 60_000);
+      }
+      show(today);
+      schedule.classList.add('enhanced');
+      if (soloHoy) schedule.classList.add('solo-hoy');
+    });
+  };
+
+  document.addEventListener('astro:page-load', setup);
+</script>
+
+<style>
+  .schedule {
+    display: grid;
+    gap: var(--ui-space-5);
+  }
+
+  .days {
+    justify-self: start;
+    max-width: 100%;
+  }
+
+  /* Sin JavaScript se ven todos los dias; con JavaScript, solo el elegido */
+  .schedule:not(.enhanced) .day[hidden] {
+    display: block;
+  }
+
+  .day-title {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-2);
+    margin: 0 0 var(--ui-space-3);
+    font-size: var(--ui-font-size-title3);
+    font-weight: 700;
+  }
+
+  .solo-hoy .day-title {
+    display: none;
+  }
+
+  .today-badge {
+    padding: 2px 10px;
+    border-radius: var(--ui-radius-control);
+    color: var(--brand-mango-ink);
+    background: var(--brand-mango);
+    font-size: var(--ui-font-size-caption);
+    font-weight: 700;
+  }
+
+  .today-badge[hidden] {
+    display: none;
+  }
+
+  .slots {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    list-style: none;
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-color-surface);
+    box-shadow:
+      inset 0 0 0 1px var(--ui-color-border),
+      var(--ui-shadow-sm);
+  }
+
+  .slot {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: var(--ui-space-4);
+    padding: var(--ui-space-4) var(--ui-space-5);
+    transition: background-color var(--ui-duration-base) var(--ui-ease-standard);
+  }
+
+  .slot + .slot {
+    border-top: 1px solid var(--ui-color-separator);
+  }
+
+  /* El programa que suena ahora, resaltado */
+  .slot.on-air {
+    background: color-mix(in srgb, var(--site-live) 7%, var(--ui-color-surface));
+    box-shadow: inset 3px 0 0 var(--site-live);
+  }
+
+  .time {
+    display: grid;
+    align-content: start;
+    font-size: var(--ui-font-size-body);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .end {
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 400;
+  }
+
+  .info {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .name {
+    color: var(--ui-color-text);
+    font-size: var(--ui-font-size-body);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .name:hover {
+      color: var(--ui-color-primary-text);
+      text-decoration: underline;
+    }
+  }
+
+  .host {
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-subhead);
+  }
+
+  .live {
+    display: grid;
+    gap: var(--ui-space-2);
+    justify-items: start;
+    margin-top: var(--ui-space-2);
+  }
+
+  .live[hidden] {
+    display: none;
+  }
+
+  .live dgonmej-ui-progress {
+    width: min(100%, 240px);
+  }
+
+  .filler {
+    margin: var(--ui-space-3) 0 0 var(--ui-space-1);
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+  }
+</style>

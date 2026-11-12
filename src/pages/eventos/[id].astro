@@ -1,0 +1,105 @@
+---
+import { getEvento } from '../../lib/api';
+import { renderMarkdown } from '../../lib/markdown';
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import { formatoFechaLarga, iconoEvento, iso } from '../../lib/format';
+
+const evento = await getEvento(Astro.params.id!);
+if (!evento) return Astro.rewrite('/404/');
+const { html } = renderMarkdown(evento.cuerpo);
+const { titulo, fecha, hora, lugar, categoria, resumen } = evento.data;
+const base = import.meta.env.BASE_URL;
+---
+
+<Layout title={titulo} description={resumen}>
+  <article class="container article">
+    <dgonmej-ui-button variant="ghost" size="small" href={`${base}eventos/`}>
+      <dgonmej-ui-icon name="chevron-left" size="16"></dgonmej-ui-icon>Agenda
+    </dgonmej-ui-button>
+
+    <header>
+      <p class="category"><Icon name={iconoEvento[categoria]} size={18} />{categoria}</p>
+      <h1>{titulo}</h1>
+      <p class="lead">{resumen}</p>
+    </header>
+
+    <ul class="facts">
+      <li><Icon name="calendar-days" /><time datetime={iso(fecha)}>{formatoFechaLarga(fecha)}</time></li>
+      <li><Icon name="clock" />{hora}</li>
+      <li><Icon name="map-pin" />{lugar}</li>
+    </ul>
+
+    <div class="prose">
+      <Fragment set:html={html} />
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .article {
+    max-width: 760px;
+    padding-block: var(--ui-space-6) var(--ui-space-8);
+  }
+
+  header {
+    margin-top: var(--ui-space-5);
+  }
+
+  .category {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    color: var(--ui-color-primary-text);
+    font-weight: 600;
+  }
+
+  h1 {
+    margin: var(--ui-space-2) 0 0;
+    font-family: var(--ui-font-family-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  .lead {
+    margin: var(--ui-space-4) 0 0;
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-title3);
+    line-height: 1.45;
+  }
+
+  .facts {
+    display: grid;
+    gap: var(--ui-space-3);
+    margin: var(--ui-space-6) 0;
+    padding: var(--ui-space-5);
+    list-style: none;
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-color-surface);
+    box-shadow: inset 0 0 0 1px var(--ui-color-border);
+    font-weight: 600;
+  }
+
+  .facts li {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-3);
+  }
+
+  .facts :global(.icon) {
+    flex: none;
+    color: var(--ui-color-primary-text);
+  }
+
+  .prose {
+    font-size: var(--ui-font-size-body);
+    line-height: 1.6;
+  }
+
+  .prose :global(p) {
+    margin: 0 0 var(--ui-space-4);
+  }
+</style>

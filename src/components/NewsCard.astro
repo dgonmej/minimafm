@@ -1,0 +1,69 @@
+---
+import type { Noticia } from '../lib/api';
+import { formatoFecha, iso } from '../lib/format';
+
+interface Props {
+  noticia: Noticia;
+  destacada?: boolean;
+}
+
+const { noticia, destacada = false } = Astro.props;
+const { titulo, fecha, categoria, resumen, autor } = noticia.data;
+const href = `${import.meta.env.BASE_URL}noticias/${noticia.id}/`;
+---
+
+<dgonmej-ui-card class:list={['news', { destacada }]} href={href} interactive padding={destacada ? 'spacious' : 'regular'}>
+  <div slot="header" class="head">
+    <dgonmej-ui-badge variant="accent" size="small">{categoria}</dgonmej-ui-badge>
+    <time datetime={iso(fecha)}>{formatoFecha(fecha)}</time>
+  </div>
+  <h3>{titulo}</h3>
+  <p class="text">{resumen}</p>
+  <p slot="footer" class="author">{autor}</p>
+</dgonmej-ui-card>
+
+<style>
+  .news {
+    height: 100%;
+  }
+
+  .head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--ui-space-2) var(--ui-space-3);
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 400;
+  }
+
+  h3 {
+    margin: 0 0 var(--ui-space-2);
+    font-size: var(--ui-font-size-title3);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+
+  .destacada h3 {
+    font-family: var(--ui-font-family-display);
+    font-size: var(--ui-font-size-title1);
+    letter-spacing: var(--ui-letter-spacing-tight);
+  }
+
+  .text {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .destacada .text {
+    font-size: var(--ui-font-size-title3);
+    line-height: 1.4;
+  }
+
+  .author {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+  }
+</style>

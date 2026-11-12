@@ -1,0 +1,659 @@
+<!doctype html>
+<!--
+  Pagina de error 500 de Mínima FM. Es AUTONOMA: no usa la API, ni archivos externos, ni la
+  libreria de componentes, para que se vea aunque la web o la API esten caidas.
+  La usan Astro (src/pages/500.astro) y nginx (502, 503 y 504, ver minimafm-api/deploy/nginx.conf).
+  Los datos de contacto y la direccion del directo estan escritos aqui: al cambiarlos en el panel,
+  actualizalos tambien en este archivo.
+-->
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <title>Hemos perdido la señal | Mínima FM 97.9</title>
+    <meta name="theme-color" content="#f7f5f2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#151210" media="(prefers-color-scheme: dark)" />
+    <script>
+      // Mismo tema que la web: el elegido por la persona o, si no, el del sistema
+      try {
+        var t = localStorage.getItem('dgonmej-ui-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    </script>
+    <style>
+      /* Paleta de Mínima FM (la misma de la web): atardecer, añil y neutros cálidos */
+      :root {
+        --bg: #f7f5f2;
+        --surface: #ffffff;
+        --fill: rgb(120 100 85 / 0.1);
+        --text: #2a2420;
+        --muted: #6b625b;
+        --primary: #c2410c;
+        --primary-text: #c2410c;
+        --tint: rgb(194 65 12 / 0.1);
+        --border: rgb(80 60 45 / 0.1);
+        --sep: rgb(80 60 45 / 0.14);
+        --live: #d70015;
+        --screen: #2a2420;
+        --screen-ink: #f3eee9;
+        --shadow: 0 1px 3px rgb(0 0 0 / 0.06), 0 8px 24px -8px rgb(0 0 0 / 0.14);
+        --ambient: radial-gradient(55% 45% at 0% 0%, rgb(245 166 35 / 0.14), transparent 70%),
+          radial-gradient(50% 40% at 100% 5%, rgb(228 87 46 / 0.1), transparent 70%),
+          radial-gradient(60% 50% at 50% 100%, rgb(61 46 134 / 0.06), transparent 70%);
+        --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+        --display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+        color-scheme: light;
+      }
+      :root[data-theme='dark'] {
+        --bg: #151210;
+        --surface: #221d1a;
+        --fill: rgb(255 240 225 / 0.07);
+        --text: #f3eee9;
+        --muted: #b3a89f;
+        --primary: #fb923c;
+        --primary-text: #fb923c;
+        --tint: rgb(251 146 60 / 0.16);
+        --border: rgb(255 240 225 / 0.08);
+        --sep: rgb(255 240 225 / 0.1);
+        --live: #ff6b62;
+        --screen: #0f0d0c;
+        --shadow: 0 1px 3px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
+        --ambient: radial-gradient(55% 45% at 0% 0%, rgb(245 166 35 / 0.1), transparent 70%),
+          radial-gradient(50% 40% at 100% 5%, rgb(228 87 46 / 0.1), transparent 70%),
+          radial-gradient(60% 50% at 50% 100%, rgb(169 156 240 / 0.06), transparent 70%);
+        color-scheme: dark;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) {
+          --bg: #151210;
+          --surface: #221d1a;
+          --fill: rgb(255 240 225 / 0.07);
+          --text: #f3eee9;
+          --muted: #b3a89f;
+          --primary: #fb923c;
+          --primary-text: #fb923c;
+          --tint: rgb(251 146 60 / 0.16);
+          --border: rgb(255 240 225 / 0.08);
+          --sep: rgb(255 240 225 / 0.1);
+          --live: #ff6b62;
+          --screen: #0f0d0c;
+          --shadow: 0 1px 3px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
+          --ambient: radial-gradient(55% 45% at 0% 0%, rgb(245 166 35 / 0.1), transparent 70%),
+            radial-gradient(50% 40% at 100% 5%, rgb(228 87 46 / 0.1), transparent 70%),
+            radial-gradient(60% 50% at 50% 100%, rgb(169 156 240 / 0.06), transparent 70%);
+          color-scheme: dark;
+        }
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+        text-size-adjust: 100%;
+      }
+      /* "hidden" no funciona en SVG sin esto */
+      [hidden] {
+        display: none !important;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
+        font-family: var(--font);
+        font-size: 1.0625rem;
+        line-height: 1.47;
+        color: var(--text);
+        background: var(--ambient), var(--bg);
+        background-attachment: fixed;
+        -webkit-font-smoothing: antialiased;
+      }
+      a {
+        color: var(--primary-text);
+      }
+      :focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 3px;
+      }
+      .container {
+        width: 100%;
+        max-width: 1160px;
+        margin: 0 auto;
+        padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right));
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+      }
+
+      /* Cabecera con el logo sobre placa clara, como la web */
+      header {
+        padding-block: 14px;
+      }
+      .brand {
+        display: inline-flex;
+        padding: 4px 10px;
+        border-radius: 6px;
+        background: #fffdfb;
+        box-shadow: inset 0 0 0 1px rgb(80 60 45 / 0.1);
+      }
+      .brand img {
+        display: block;
+        width: 104px;
+        height: auto;
+      }
+
+      main {
+        display: grid;
+        flex: 1 0 auto;
+        gap: 24px;
+        align-content: center;
+        padding-block: 16px 40px;
+      }
+      .hero {
+        display: grid;
+        gap: 24px;
+        align-items: center;
+      }
+      .art {
+        display: block;
+        width: 100%;
+        max-width: 560px;
+        height: auto;
+        overflow: visible;
+      }
+      .eyebrow {
+        margin: 0;
+        color: var(--primary-text);
+        font-weight: 700;
+      }
+      h1 {
+        margin: 8px 0 0;
+        font-family: var(--display);
+        font-size: clamp(2.25rem, 5vw, 3rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.08;
+      }
+      .lead {
+        max-width: 34em;
+        margin: 16px 0 0;
+        color: var(--muted);
+        font-size: 1.25rem;
+        line-height: 1.4;
+      }
+      .reassure {
+        max-width: 34em;
+        margin: 12px 0 0;
+        color: var(--muted);
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+      }
+
+      /* Botones: mismo degradado y gesto de pulsación que los de la web */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 44px;
+        padding: 0 20px;
+        border: 0;
+        border-radius: 8px;
+        font: inherit;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform 0.15s cubic-bezier(0.32, 0.72, 0, 1), box-shadow 0.15s;
+      }
+      .btn:active {
+        transform: scale(0.97);
+      }
+      .btn svg {
+        flex: none;
+      }
+      .btn-primary {
+        color: #fff;
+        background: linear-gradient(180deg, #c2410c 0%, #9a3412 100%);
+        box-shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 6px 14px -6px rgb(194 65 12 / 0.55);
+      }
+      .btn-soft {
+        color: var(--primary-text);
+        background: var(--tint);
+      }
+
+      /* Tarjetas: escuchar mientras tanto y contacto */
+      .cards {
+        display: grid;
+        gap: 16px;
+      }
+      .card {
+        padding: 24px;
+        border-radius: 10px;
+        background: var(--surface);
+        box-shadow: inset 0 0 0 1px var(--border), var(--shadow);
+      }
+      .card h2 {
+        margin: 0;
+        font-family: var(--display);
+        font-size: 1.375rem;
+        letter-spacing: -0.02em;
+      }
+      .card p {
+        margin: 8px 0 0;
+        color: var(--muted);
+      }
+      .listen {
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient(70% 90% at 0% 0%, rgb(245 166 35 / 0.16), transparent 70%),
+          radial-gradient(60% 80% at 100% 100%, rgb(228 87 46 / 0.12), transparent 70%), var(--surface);
+      }
+      .live {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        color: var(--live);
+        font-size: 0.8125rem;
+        font-weight: 700;
+      }
+      .live::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+      .listen .btn {
+        margin-top: 16px;
+      }
+      .status {
+        min-height: 1.5em;
+        margin-top: 12px !important;
+        font-size: 0.9375rem;
+      }
+      .status.error {
+        color: var(--live);
+        font-weight: 600;
+      }
+      .contact ul {
+        display: grid;
+        gap: 4px;
+        margin: 12px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+      .contact a {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 44px;
+        padding: 0 12px;
+        margin-inline: -12px;
+        border-radius: 8px;
+        color: var(--text);
+        font-weight: 600;
+        text-decoration: none;
+      }
+      .contact a svg {
+        flex: none;
+        color: var(--primary-text);
+      }
+      @media (hover: hover) {
+        .contact a:hover {
+          background: var(--fill);
+        }
+      }
+
+      footer {
+        padding-block: 20px calc(20px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--sep);
+        color: var(--muted);
+        font-size: 0.8125rem;
+      }
+
+      @media (min-width: 900px), (orientation: landscape) and (min-width: 600px) {
+        .hero {
+          grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+          gap: 48px;
+        }
+      }
+      @media (min-width: 700px) {
+        .cards {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      /* Ilustración: colores del tema */
+      .art .shadow {
+        fill: var(--text);
+        opacity: 0.08;
+      }
+      .art .mast line,
+      .art .mast-top {
+        fill: none;
+        stroke: var(--muted);
+        stroke-width: 4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .art .mast line {
+        stroke-width: 3;
+      }
+      .art .mast-top {
+        stroke-width: 5;
+      }
+      .art .mast-ball {
+        fill: var(--muted);
+      }
+      .art .base {
+        fill: var(--muted);
+      }
+      .art .sparks line {
+        stroke: var(--primary);
+        stroke-width: 3;
+        stroke-linecap: round;
+      }
+      .art .waves path {
+        fill: none;
+        stroke: var(--primary);
+        stroke-width: 4;
+        stroke-linecap: round;
+      }
+      .art .w2 {
+        stroke-dasharray: 7 11;
+        opacity: 0.7;
+      }
+      .art .w3 {
+        stroke-dasharray: 4 14;
+        opacity: 0.4;
+      }
+      .art .device {
+        fill: var(--surface);
+        stroke: var(--sep);
+        stroke-width: 2;
+      }
+      .art .stripe {
+        fill: url(#sunset);
+      }
+      .art .screen {
+        fill: var(--screen);
+      }
+      .art .ticks line {
+        stroke: var(--screen-ink);
+        stroke-width: 1.5;
+        opacity: 0.6;
+      }
+      .art .labels text {
+        fill: var(--screen-ink);
+        font: 600 11px var(--font);
+        opacity: 0.75;
+      }
+      .art .needle {
+        stroke: var(--live);
+        stroke-width: 3;
+        stroke-linecap: round;
+      }
+      .art .noise {
+        fill: #fff;
+        mix-blend-mode: screen;
+      }
+      .art .knob {
+        fill: var(--fill);
+        stroke: var(--sep);
+        stroke-width: 2;
+      }
+      .art .freq {
+        fill: var(--muted);
+        font: 700 13px var(--font);
+      }
+      .art .led {
+        fill: var(--live);
+      }
+
+      /* Movimiento suave solo si la persona no pide reducirlo */
+      @media (prefers-reduced-motion: no-preference) {
+        .art .noise {
+          animation: flicker 0.5s steps(2) infinite;
+        }
+        .art .sparks {
+          animation: spark 1.3s ease-in-out infinite alternate;
+        }
+        .art .led {
+          animation: blink 2s ease-in-out infinite;
+        }
+        .art .w1,
+        .art .w2,
+        .art .w3 {
+          animation: fade 2.6s ease-in-out infinite alternate;
+        }
+        .art .w2 {
+          animation-delay: 0.3s;
+        }
+        .art .w3 {
+          animation-delay: 0.6s;
+        }
+      }
+      @keyframes flicker {
+        0% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 0.8;
+        }
+        100% {
+          opacity: 0.6;
+        }
+      }
+      @keyframes spark {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0.15;
+        }
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.25;
+        }
+      }
+      @keyframes fade {
+        from {
+          opacity: 0.9;
+        }
+        to {
+          opacity: 0.2;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <a class="brand" href="/" aria-label="Mínima FM, inicio"><img src="data:image/webp;base64,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" alt="Mínima FM" width="104" height="42" /></a>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero" aria-labelledby="titulo">
+        <svg class="art" viewBox="0 0 560 360" role="img" aria-labelledby="art-title">
+  <title id="art-title">Un dial de radio FM lleno de interferencias y una antena torcida que ya no emite señal</title>
+  <defs>
+    <filter id="static" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9 0.5" numOctaves="2" seed="7" result="n"/>
+      <feColorMatrix in="n" type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0" intercept="0.6"/></feComponentTransfer>
+    </filter>
+    <clipPath id="screen"><rect x="94" y="242" width="372" height="48" rx="10"/></clipPath>
+    <linearGradient id="sunset" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3d2e86"/><stop offset=".35" stop-color="#a3245b"/>
+      <stop offset=".68" stop-color="#e4572e"/><stop offset="1" stop-color="#f5a623"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse class="shadow" cx="280" cy="348" rx="236" ry="10"/>
+
+  <!-- Antena torcida -->
+  <g class="mast"><line x1="404.0" y1="216" x2="382.0" y2="88.0"/><line x1="444.0" y1="216" x2="394.0" y2="88.0"/><line x1="404.0" y1="216.0" x2="431.5" y2="184.0"/><line x1="431.5" y1="184.0" x2="393.0" y2="152.0"/><line x1="393.0" y1="152.0" x2="406.5" y2="120.0"/><line x1="406.5" y1="120.0" x2="382.0" y2="88.0"/><line x1="398.5" y1="184.0" x2="431.5" y2="184.0"/><line x1="393.0" y1="152.0" x2="419.0" y2="152.0"/><line x1="387.5" y1="120.0" x2="406.5" y2="120.0"/></g>
+  <rect class="base" x="394" y="212" width="62" height="8" rx="3"/>
+  <path class="mast-top" d="M388.0 88 L366 62 L338 74"/>
+  <circle class="mast-ball" cx="338" cy="74" r="4"/>
+  <g class="sparks"><line x1="372" y1="52" x2="380" y2="44"/><line x1="360" y1="52" x2="356" y2="42"/><line x1="374" y1="64" x2="386" y2="64"/></g>
+  <g class="waves">
+    <path class="w1" d="M369.8 40.3 A22 22 0 0 1 387.7 58.2"/><path class="w2" d="M372.9 22.6 A40 40 0 0 1 405.4 55.1"/><path class="w3" d="M376.1 4.9 A58 58 0 0 1 423.1 51.9"/>
+  </g>
+
+  <!-- Aparato -->
+  <rect class="device" x="70" y="222" width="420" height="116" rx="18"/>
+  <rect class="stripe" x="70" y="222" width="420" height="8" rx="4"/>
+  <rect class="screen" x="94" y="242" width="372" height="48" rx="10"/>
+  <g class="ticks"><line x1="112.6" x2="112.6" y1="248" y2="262"/><line x1="121.2" x2="121.2" y1="248" y2="256"/><line x1="129.8" x2="129.8" y1="248" y2="256"/><line x1="138.3" x2="138.3" y1="248" y2="256"/><line x1="146.9" x2="146.9" y1="248" y2="256"/><line x1="155.5" x2="155.5" y1="248" y2="256"/><line x1="164.1" x2="164.1" y1="248" y2="256"/><line x1="172.7" x2="172.7" y1="248" y2="256"/><line x1="181.3" x2="181.3" y1="248" y2="262"/><line x1="189.9" x2="189.9" y1="248" y2="256"/><line x1="198.4" x2="198.4" y1="248" y2="256"/><line x1="207.0" x2="207.0" y1="248" y2="256"/><line x1="215.6" x2="215.6" y1="248" y2="256"/><line x1="224.2" x2="224.2" y1="248" y2="256"/><line x1="232.8" x2="232.8" y1="248" y2="256"/><line x1="241.4" x2="241.4" y1="248" y2="256"/><line x1="250.0" x2="250.0" y1="248" y2="262"/><line x1="258.5" x2="258.5" y1="248" y2="256"/><line x1="267.1" x2="267.1" y1="248" y2="256"/><line x1="275.7" x2="275.7" y1="248" y2="256"/><line x1="284.3" x2="284.3" y1="248" y2="256"/><line x1="292.9" x2="292.9" y1="248" y2="256"/><line x1="301.5" x2="301.5" y1="248" y2="256"/><line x1="310.0" x2="310.0" y1="248" y2="256"/><line x1="318.6" x2="318.6" y1="248" y2="262"/><line x1="327.2" x2="327.2" y1="248" y2="256"/><line x1="335.8" x2="335.8" y1="248" y2="256"/><line x1="344.4" x2="344.4" y1="248" y2="256"/><line x1="353.0" x2="353.0" y1="248" y2="256"/><line x1="361.6" x2="361.6" y1="248" y2="256"/><line x1="370.1" x2="370.1" y1="248" y2="256"/><line x1="378.7" x2="378.7" y1="248" y2="256"/><line x1="387.3" x2="387.3" y1="248" y2="262"/><line x1="395.9" x2="395.9" y1="248" y2="256"/><line x1="404.5" x2="404.5" y1="248" y2="256"/><line x1="413.1" x2="413.1" y1="248" y2="256"/><line x1="421.7" x2="421.7" y1="248" y2="256"/><line x1="430.2" x2="430.2" y1="248" y2="256"/><line x1="438.8" x2="438.8" y1="248" y2="256"/><line x1="447.4" x2="447.4" y1="248" y2="256"/><line x1="456.0" x2="456.0" y1="248" y2="262"/></g>
+  <g class="labels"><text x="112.6" y="284" text-anchor="middle">88</text><text x="181.3" y="284" text-anchor="middle">92</text><text x="250.0" y="284" text-anchor="middle">96</text><text x="318.6" y="284" text-anchor="middle">100</text><text x="387.3" y="284" text-anchor="middle">104</text><text x="456.0" y="284" text-anchor="middle">108</text></g>
+  <line class="needle" x1="282.6" x2="282.6" y1="240" y2="292"/>
+  <g clip-path="url(#screen)"><rect class="noise" x="94" y="242" width="372" height="48" filter="url(#static)"/></g>
+
+  <circle class="knob" cx="116" cy="314" r="10"/><circle class="knob" cx="148" cy="314" r="10"/>
+  <text class="freq" x="280" y="319" text-anchor="middle">97.9 FM</text>
+  <circle class="led" cx="450" cy="314" r="5"/>
+</svg>
+        <div>
+          <p class="eyebrow">Error 500</p>
+          <h1 id="titulo">Hemos perdido la señal</h1>
+          <p class="lead">Algo ha fallado de nuestro lado y no podemos mostrarte esta página ahora mismo.</p>
+          <p class="reassure">No has hecho nada mal. Ya lo estamos revisando y lo arreglaremos lo antes posible.</p>
+          <div class="actions">
+            <button class="btn btn-primary" type="button" onclick="location.reload()">Volver a intentarlo</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="cards">
+        <section class="card listen" aria-labelledby="mientras">
+          <span class="live">En directo</span>
+          <h2 id="mientras">Mientras tanto, escúchanos</h2>
+          <p>La radio sigue emitiendo aunque la web no funcione.</p>
+          <button id="play" class="btn btn-primary" type="button" aria-pressed="false">
+            <svg id="icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.8v14.4a1 1 0 0 0 1.5.86l12-7.2a1 1 0 0 0 0-1.72l-12-7.2A1 1 0 0 0 7 4.8Z" /></svg>
+            <svg id="icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" hidden><rect x="6" y="4" width="4.5" height="16" rx="1.2" /><rect x="13.5" y="4" width="4.5" height="16" rx="1.2" /></svg>
+            <span id="play-label">Escuchar en directo</span>
+          </button>
+          <p id="status" class="status" role="status" aria-live="polite"></p>
+        </section>
+
+        <section class="card contact" aria-labelledby="urgente">
+          <h2 id="urgente">¿Necesitas algo urgente?</h2>
+          <p>Escríbenos o llámanos y te atendemos por otra vía.</p>
+          <ul>
+            <li>
+              <a href="tel:922000000">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                922 000 000
+              </a>
+            </li>
+            <li>
+              <a href="https://wa.me/34600000000" rel="noopener noreferrer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></svg>
+                WhatsApp 600 000 000
+              </a>
+            </li>
+            <li>
+              <a href="mailto:hola@minimafm.example">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>
+                hola@minimafm.example
+              </a>
+            </li>
+          </ul>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">Mínima FM 97.9. Valle de Güímar, Tenerife.</div>
+    </footer>
+
+    <script>
+      // Reproductor mínimo para el directo: no depende de nada de nuestro servidor
+      (function () {
+        var STREAM = 'https://stream-176.zeno.fm/fjmbxsddqv1uv';
+        var btn = document.getElementById('play');
+        var label = document.getElementById('play-label');
+        var iconPlay = document.getElementById('icon-play');
+        var iconPause = document.getElementById('icon-pause');
+        var status = document.getElementById('status');
+        var audio = null;
+
+        function show(state) {
+          var playing = state === 'playing' || state === 'loading';
+          btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+          iconPlay.toggleAttribute('hidden', playing);
+          iconPause.toggleAttribute('hidden', !playing);
+          label.textContent = state === 'loading' ? 'Conectando…' : state === 'playing' ? 'Pausar' : 'Escuchar en directo';
+          status.className = 'status' + (state === 'error' ? ' error' : '');
+          status.textContent =
+            state === 'playing'
+              ? 'Estás escuchando Mínima FM en directo.'
+              : state === 'error'
+                ? 'No hemos podido conectar con el directo. Inténtalo de nuevo en unos minutos o sintoniza el 97.9 FM.'
+                : '';
+        }
+
+        var timer = null;
+
+        function stop() {
+          clearTimeout(timer);
+          if (audio) {
+            audio.pause();
+            audio.removeAttribute('src');
+            audio.load();
+            audio = null;
+          }
+          show('idle');
+        }
+
+        function fail() {
+          clearTimeout(timer);
+          if (audio) {
+            audio.pause();
+            audio.removeAttribute('src');
+            audio = null;
+          }
+          show('error');
+        }
+
+        btn.addEventListener('click', function () {
+          if (audio) return stop();
+          // Cada vez se abre una conexión nueva para volver al directo y no a lo que quedó en memoria
+          audio = new Audio(STREAM);
+          show('loading');
+          audio.addEventListener('playing', function () {
+            clearTimeout(timer);
+            show('playing');
+          });
+          audio.addEventListener('error', fail);
+          // Si el directo no responde en 12 segundos, se avisa en lugar de quedarse esperando
+          timer = setTimeout(fail, 12000);
+          audio.play().catch(fail);
+        });
+              })();
+    </script>
+  </body>
+</html>

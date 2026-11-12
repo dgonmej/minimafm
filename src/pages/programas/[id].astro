@@ -1,0 +1,525 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import { dias } from '../../data/radio';
+import { getProgramas, getRadio } from '../../lib/api';
+import { describirFranja, iconoPrograma, tonoPrograma } from '../../lib/format';
+
+const [programas, radio] = await Promise.all([getProgramas(), getRadio()]);
+const i = programas.findIndex((p) => p.id === Astro.params.id);
+if (i < 0) return Astro.rewrite('/404/');
+const programa = programas[i];
+const anterior = programas[(i - 1 + programas.length) % programas.length];
+const siguiente = programas[(i + 1) % programas.length];
+const base = import.meta.env.BASE_URL;
+const diasQueSuena = new Set(programa.franjas.flatMap((f) => f.dias));
+const iniciales = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+const tel = (n: string) => n.replace(/\s/g, '');
+const mismoTipo = programas.filter((p) => p.categoria === programa.categoria && p.id !== programa.id);
+---
+
+<Layout title={programa.nombre} description={programa.descripcion}>
+  <!-- Cabecera a todo lo ancho con el color del tipo de programa -->
+  <header class:list={['band', tonoPrograma[programa.categoria]]}>
+    <div class="container band-inner">
+      <a class="back" href={`${base}programas/`}>
+        <dgonmej-ui-icon name="chevron-left" size="16"></dgonmej-ui-icon>Programas
+      </a>
+      <p class="category">
+        <Icon name={iconoPrograma[programa.categoria]} size={18} />
+        {programa.categoria}
+        <span class="on-air" data-on-air hidden>En antena</span>
+      </p>
+      <h1>{programa.nombre}</h1>
+      <p class="lead">{programa.descripcion}</p>
+      <div class="host">
+        <dgonmej-ui-avatar size="lg" name={programa.presentador}></dgonmej-ui-avatar>
+        <span>
+          <span class="host-label">Presenta</span>
+          <strong>{programa.presentador}</strong>
+        </span>
+      </div>
+      <Icon name={iconoPrograma[programa.categoria]} size={220} />
+    </div>
+  </header>
+
+  <div class="container layout" data-program={programa.id}>
+    <div class="main">
+      <section aria-labelledby="secciones">
+        <h2 id="secciones" class="title">En el programa</h2>
+        <ol class="sections">
+          {
+            programa.secciones.map((s, i) => (
+              <li>
+                <span class="num" aria-hidden="true">{i + 1}</span>
+                <span>{s}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section class="join" aria-labelledby="participa">
+        <h2 id="participa" class="title">Participa en directo</h2>
+        <p>
+          Llama o escribe mientras suena {programa.nombre}: preguntas, saludos, avisos del barrio o la canción que quieres
+          escuchar.
+        </p>
+        <div class="join-actions">
+          <dgonmej-ui-button variant="primary" href={`https://wa.me/34${tel(radio.whatsapp)}`} target="_blank">
+            <Icon name="message-circle" size={18} />Escribir por WhatsApp
+          </dgonmej-ui-button>
+          <dgonmej-ui-button variant="secondary" href={`tel:${tel(radio.telefono)}`}>
+            <Icon name="phone" size={18} />Llamar al {radio.telefono}
+          </dgonmej-ui-button>
+        </div>
+      </section>
+    </div>
+
+    <aside class="when" aria-labelledby="cuando">
+      <h2 id="cuando" class="title">Cuándo escucharlo</h2>
+      <ol class="week" aria-label="Días de emisión">
+        {
+          dias.map((d, i) => (
+            <li class:list={{ on: diasQueSuena.has(i) }}>
+              <abbr title={d}>{iniciales[i]}</abbr>
+              <span class="sr-only">{diasQueSuena.has(i) ? 'se emite' : 'no se emite'}</span>
+            </li>
+          ))
+        }
+      </ol>
+      <ul class="slots">
+        {
+          programa.franjas.map((f) => (
+            <li>
+              <Icon name="clock" size={16} />
+              {describirFranja(f)}
+            </li>
+          ))
+        }
+      </ul>
+      <p class="next" data-next hidden></p>
+      <dgonmej-ui-button variant="secondary" size="small" href={`${base}horarios/`}>
+        Ver la parrilla completa
+      </dgonmej-ui-button>
+    </aside>
+  </div>
+
+  <nav class="container more" aria-label="Más programas">
+    {
+      mismoTipo.length > 0 && (
+        <p class="same">
+          Más de {programa.categoria.toLowerCase()}:{' '}
+          {mismoTipo.map((p, i) => (
+            <>
+              <a href={`${base}programas/${p.id}/`}>{p.nombre}</a>
+              {i < mismoTipo.length - 2 ? ', ' : i === mismoTipo.length - 2 ? ' y ' : ''}
+            </>
+          ))}
+        </p>
+      )
+    }
+    <div class="pager">
+      <a href={`${base}programas/${anterior.id}/`} class="prev">
+        <span>Anterior</span>
+        <strong>{anterior.nombre}</strong>
+      </a>
+      <a href={`${base}programas/${siguiente.id}/`} class="next-link">
+        <span>Siguiente</span>
+        <strong>{siguiente.nombre}</strong>
+      </a>
+    </div>
+  </nav>
+</Layout>
+
+<script>
+  import { proximaEmision, parrilla } from '../../lib/schedule';
+  import { dias } from '../../data/radio';
+
+  // Proxima emision en lenguaje natural y aviso si esta sonando ahora
+  const setup = () => {
+    const box = document.querySelector<HTMLElement>('[data-program]');
+    if (!box) return;
+    const p = proximaEmision(box.dataset.program!, parrilla());
+    const next = box.querySelector<HTMLElement>('[data-next]')!;
+    const onAir = document.querySelector<HTMLElement>('[data-on-air]')!;
+    if (!p) return;
+    onAir.hidden = !p.sonando;
+    const { emision, enDias, sonando } = p;
+    const cuando =
+      enDias === 0 ? 'hoy' : enDias === 1 ? 'mañana' : `el ${dias[emision.dia].toLowerCase()}`;
+    next.textContent = sonando
+      ? `Está sonando ahora, hasta las ${emision.fin}.`
+      : `Próxima emisión: ${cuando} a las ${emision.inicio}.`;
+    next.classList.toggle('live', sonando);
+    next.hidden = false;
+  };
+  document.addEventListener('astro:page-load', setup);
+</script>
+
+<style>
+  /* ---------- Cabecera de color ---------- */
+  .band {
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+  }
+
+  /* Velo oscuro detras del texto: el blanco cumple AA tambien sobre los tonos claros (ocre, platanera) */
+  .band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, rgb(20 12 6 / 0.45) 0%, rgb(20 12 6 / 0.3) 55%, rgb(20 12 6 / 0.1) 100%);
+  }
+
+  .band-inner {
+    position: relative;
+    display: grid;
+    gap: var(--ui-space-3);
+    justify-items: start;
+    padding-block: var(--ui-space-6) calc(var(--ui-space-8) * 1.5);
+  }
+
+  /* Icono enorme de fondo, como una marca de agua */
+  .band-inner > :global(.icon:last-child) {
+    position: absolute;
+    right: var(--ui-space-4);
+    bottom: -40px;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+
+  @media (max-width: 599px) {
+    .band-inner > :global(.icon:last-child) {
+      width: 140px;
+      height: 140px;
+    }
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 44px;
+    margin-left: -6px;
+    padding-inline: 6px;
+    border-radius: var(--ui-radius-control);
+    color: rgb(255 255 255 / 0.9);
+    font-size: var(--ui-font-size-subhead);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .back:hover {
+      background: rgb(255 255 255 / 0.14);
+    }
+  }
+
+  .back:focus-visible {
+    outline-color: #fff;
+  }
+
+  .category {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: var(--ui-space-4) 0 0;
+    font-weight: 600;
+  }
+
+  .on-air {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: var(--ui-space-2);
+    padding: 2px 10px;
+    border-radius: var(--ui-radius-control);
+    color: #fff;
+    background: #d70015;
+    font-size: var(--ui-font-size-footnote);
+  }
+
+  .on-air::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .on-air[hidden] {
+    display: none;
+  }
+
+  h1 {
+    position: relative;
+    max-width: 14em;
+    margin: 0;
+    font-family: var(--ui-font-family-display);
+    font-size: clamp(2.5rem, 7vw, 4.25rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+  }
+
+  .lead {
+    position: relative;
+    max-width: 36em;
+    margin: var(--ui-space-2) 0 0;
+    color: rgb(255 255 255 / 0.92);
+    font-size: var(--ui-font-size-title3);
+    line-height: 1.45;
+  }
+
+  .host {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-3);
+    margin-top: var(--ui-space-4);
+  }
+
+  .host > span {
+    display: grid;
+    line-height: 1.3;
+  }
+
+  .host-label {
+    color: rgb(255 255 255 / 0.85);
+    font-size: var(--ui-font-size-footnote);
+  }
+
+  /* ---------- Cuerpo ---------- */
+  .layout {
+    display: grid;
+    gap: var(--ui-space-8);
+    padding-block: var(--ui-space-8);
+  }
+
+  @media (min-width: 900px) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr) 340px;
+      align-items: start;
+    }
+    /* La ficha de horario sube y se solapa con la cabecera */
+    .when {
+      position: sticky;
+      top: 80px;
+      margin-top: calc(var(--ui-space-8) * -2);
+    }
+  }
+
+  .main {
+    display: grid;
+    gap: calc(var(--ui-space-8) * 1.25);
+  }
+
+  .title {
+    margin: 0 0 var(--ui-space-4);
+    font-family: var(--ui-font-family-display);
+    font-size: var(--ui-font-size-title2);
+    font-weight: 700;
+    letter-spacing: var(--ui-letter-spacing-tight);
+  }
+
+  .sections {
+    display: grid;
+    gap: var(--ui-space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sections li {
+    display: flex;
+    align-items: center;
+    gap: var(--ui-space-4);
+    padding-block: var(--ui-space-3);
+    border-bottom: 1px solid var(--ui-color-separator);
+    font-size: var(--ui-font-size-title3);
+    font-weight: 600;
+  }
+
+  .num {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--ui-color-primary-text);
+    background: var(--ui-color-primary-tint);
+    font-size: var(--ui-font-size-body);
+    font-weight: 700;
+  }
+
+  .join {
+    padding: var(--ui-space-6);
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-color-fill);
+  }
+
+  .join p {
+    max-width: 36em;
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .join-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ui-space-3);
+    margin-top: var(--ui-space-5);
+  }
+
+  .when {
+    display: grid;
+    gap: var(--ui-space-4);
+    justify-items: start;
+    padding: var(--ui-space-6);
+    border-radius: var(--ui-radius-lg);
+    background: var(--ui-color-surface);
+    box-shadow:
+      inset 0 0 0 1px var(--ui-color-border),
+      var(--ui-shadow-lg);
+  }
+
+  .when .title {
+    margin: 0;
+    font-size: var(--ui-font-size-title3);
+  }
+
+  .week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .week li {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border-radius: var(--ui-radius-md);
+    color: var(--ui-color-text-muted);
+    background: var(--ui-color-fill);
+    font-size: var(--ui-font-size-footnote);
+    font-weight: 700;
+  }
+
+  .week li.on {
+    color: var(--ui-color-primary-contrast, #fff);
+    background: var(--ui-gradient-primary);
+  }
+
+  .week abbr {
+    text-decoration: none;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .slots {
+    display: grid;
+    gap: var(--ui-space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 600;
+  }
+
+  .slots li {
+    display: flex;
+    align-items: start;
+    gap: 8px;
+  }
+
+  .slots :global(.icon) {
+    flex: none;
+    margin-top: 3px;
+    color: var(--ui-color-primary-text);
+  }
+
+  .next {
+    margin: 0;
+    padding: var(--ui-space-3) var(--ui-space-4);
+    width: 100%;
+    border-radius: var(--ui-radius-md);
+    background: var(--ui-color-fill);
+    font-size: var(--ui-font-size-subhead);
+  }
+
+  .next.live {
+    color: var(--site-live);
+    background: color-mix(in srgb, var(--site-live) 10%, transparent);
+    font-weight: 600;
+  }
+
+  .next[hidden] {
+    display: none;
+  }
+
+  /* ---------- Mas programas ---------- */
+  .more {
+    display: grid;
+    gap: var(--ui-space-5);
+  }
+
+  .same {
+    margin: 0;
+    color: var(--ui-color-text-muted);
+  }
+
+  .same a {
+    font-weight: 600;
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--ui-space-3);
+  }
+
+  .pager a {
+    display: grid;
+    gap: 2px;
+    padding: var(--ui-space-4) var(--ui-space-5);
+    border-radius: var(--ui-radius-lg);
+    color: var(--ui-color-text);
+    background: var(--ui-color-surface);
+    box-shadow: inset 0 0 0 1px var(--ui-color-border);
+    text-decoration: none;
+    transition: transform var(--ui-duration-fast) var(--ui-ease-standard);
+  }
+
+  .pager a:active {
+    transform: scale(0.98);
+  }
+
+  @media (hover: hover) {
+    .pager a:hover {
+      box-shadow: inset 0 0 0 1px var(--ui-color-primary);
+    }
+  }
+
+  .pager span {
+    color: var(--ui-color-text-muted);
+    font-size: var(--ui-font-size-footnote);
+  }
+
+  .pager .next-link {
+    text-align: right;
+  }
+</style>
