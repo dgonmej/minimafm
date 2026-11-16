@@ -29,12 +29,11 @@ salir en la portada.
 
 ## Desarrollo
 
-Necesita, en carpetas vecinas, `dgonmej-ui` (compilado) y `minimafm-api` con la API en marcha
-(ver su README):
+Necesita `minimafm-api` con la API en marcha (ver su README). `dgonmej-ui` se instala desde
+[npm](https://www.npmjs.com/package/dgonmej-ui) con el resto de dependencias:
 
 ```bash
-cd ../dgonmej-ui && npm install && npm run build
-cd ../minimafm && npm install
+npm install
 npm run dev        # http://localhost:4321, lee la API de http://localhost:3000
 ```
 

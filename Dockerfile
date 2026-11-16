@@ -1,14 +1,8 @@
 # syntax=docker/dockerfile:1
-# Web de Minima FM (Astro en modo servidor). Necesita el repositorio dgonmej-ui como contexto
-# adicional; se construye desde el docker-compose.yml de minimafm-api.
-
-FROM node:24-alpine AS ui
-WORKDIR /src/dgonmej-ui
-COPY --from=dgonmej-ui --exclude=node_modules --exclude=dist --exclude=.git . .
-RUN npm ci --ignore-scripts && npm run build
+# Web de Minima FM (Astro en modo servidor). Se construye desde el docker-compose.yml de
+# minimafm-api; dgonmej-ui se instala desde npm.
 
 FROM node:24-alpine AS build
-COPY --from=ui /src/dgonmej-ui /src/dgonmej-ui
 WORKDIR /src/minimafm
 COPY package.json package-lock.json ./
 RUN npm install --no-audit --no-fund
