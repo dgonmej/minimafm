@@ -19,6 +19,25 @@ const parrilla = (await getProgramas()).map(({ id, nombre, presentador, franjas 
 const fullTitle = title ? `${title} | ${radio.nombre} ${radio.frecuencia}` : `${radio.nombre} ${radio.frecuencia} | La voz del Valle`;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const siteName = `${radio.nombre} ${radio.frecuencia}`;
+
+// Imagen al compartir (1200 x 630, en public/og.png) y datos de la emisora para Google
+const image = new URL('/og.png', Astro.site).href;
+const imageAlt = `${siteName}, la radio del ${radio.zona}`;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'RadioStation',
+  name: radio.nombre,
+  alternateName: siteName,
+  url: new URL('/', Astro.site).href,
+  logo: new URL('/android-chrome-512x512.png', Astro.site).href,
+  image,
+  description: radio.descripcion,
+  slogan: radio.lema,
+  areaServed: radio.zona,
+  address: radio.direccion,
+  sameAs: radio.redes.map((r) => r.url),
+};
 ---
 
 <!doctype html>
@@ -34,9 +53,22 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
     <link rel="icon" type="image/png" sizes="32x32" href={`${base}/favicon-32x32.png`} />
     <link rel="icon" type="image/png" sizes="16x16" href={`${base}/favicon-16x16.png`} />
+    <link rel="icon" type="image/png" sizes="192x192" href={`${base}/android-chrome-192x192.png`} />
     <link rel="apple-touch-icon" sizes="180x180" href={`${base}/apple-touch-icon.png`} />
     <link rel="manifest" href={`${base}/site.webmanifest`} />
     <meta name="theme-color" content="#f7f5f2" media="(prefers-color-scheme: light)" />
