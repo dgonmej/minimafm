@@ -3,6 +3,9 @@
 # minimafm-api; dgonmej-ui se instala desde npm.
 
 FROM node:24-alpine AS build
+# Direccion publica de la web: Astro la usa al compilar (enlaces canonicos y redes sociales)
+ARG SITE=http://localhost:8080
+ENV SITE=$SITE
 WORKDIR /src/minimafm
 COPY package.json package-lock.json ./
 RUN npm install --no-audit --no-fund
