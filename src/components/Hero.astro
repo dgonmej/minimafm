@@ -13,7 +13,7 @@ const base = import.meta.env.BASE_URL;
   <div class="container inner">
     <div class="intro">
       <div class="logo-plate">
-        <Image src={logoFull} alt={`${radio.nombre} ${radio.frecuencia}, ${radio.lema}`} width={360} loading="eager" />
+        <Image src={logoFull} alt={`${radio.nombre} ${radio.frecuencia}, ${radio.lema}`} width={480} loading="eager" />
       </div>
       <h1 id="hero-title">La radio del Valle de Güímar</h1>
       <p class="lead">Música, información local y las voces de nuestros vecinos, las 24 horas del día.</p>
@@ -149,7 +149,7 @@ const base = import.meta.env.BASE_URL;
   }
 
   .logo-plate :global(img) {
-    width: min(300px, 64vw);
+    width: min(240px, 56vw);
     height: auto;
   }
 

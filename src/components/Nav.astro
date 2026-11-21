@@ -19,7 +19,7 @@ const menuItems = links.map((l) => ({ value: l.href, label: l.label, icon: l.ico
 
 <dgonmej-ui-nav-bar class="site-nav" style="--ui-nav-bar-max-width: var(--site-max)">
   <a slot="leading" class="brand" href={base} aria-label="Mínima FM, inicio">
-    <Image src={logo} alt="" width={120} loading="eager" />
+    <Image src={logo} alt="" height={88} loading="eager" />
   </a>
 
   {
@@ -73,8 +73,8 @@ const menuItems = links.map((l) => ({ value: l.href, label: l.label, icon: l.ico
   }
 
   .brand :global(img) {
-    width: 104px;
-    height: auto;
+    width: auto;
+    height: 44px;
   }
 
   @media (max-width: 359px) {
@@ -97,7 +97,7 @@ const menuItems = links.map((l) => ({ value: l.href, label: l.label, icon: l.ico
       padding: 4px 8px;
     }
     .brand :global(img) {
-      width: 84px;
+      height: 38px;
     }
   }
 

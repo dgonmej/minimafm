@@ -16,7 +16,7 @@ const tel = (n: string) => n.replace(/\s/g, '');
   <div class="container grid">
     <div class="about">
       <div class="logo-plate">
-        <Image src={logoFull} alt={`${radio.nombre} ${radio.frecuencia}, ${radio.lema}`} width={220} />
+        <Image src={logoFull} alt={`${radio.nombre} ${radio.frecuencia}, ${radio.lema}`} width={300} />
       </div>
       <p>{radio.descripcion}</p>
     </div>
@@ -104,7 +104,7 @@ const tel = (n: string) => n.replace(/\s/g, '');
   }
 
   .logo-plate :global(img) {
-    width: 200px;
+    width: 150px;
     height: auto;
   }
 
