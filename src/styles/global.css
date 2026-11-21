@@ -1,48 +1,54 @@
 /*
- * Paleta de Mínima FM, sacada del logo: un atardecer en el Valle.
- *   Atardecer (naranja)  acento principal: botones y enlaces
- *   Añil                 el lema y detalles de marca
- *   Platanera (verde)    "En directo" y la frecuencia (el bocadillo del 97.9)
- *   Mango (amarillo)     fechas destacadas
- *   Base neutra calida   fondos y superficies (nada de grises frios)
- * Se aplica sobre los tokens de dgonmej-ui. Todos los pares cumplen WCAG AA.
+ * Paleta y tipografía de Mínima FM, del manual de identidad (Figma «Imágenes vectorizadas»):
+ *   Añil      color principal: botones y marca
+ *   Ciruela   enlaces y acentos de texto
+ *   Naranja y Mango   el atardecer: degradados y fechas destacadas
+ *   Rojo directo      solo para lo que está sonando
+ *   Vinilo / Papel    texto y fondos; en oscuro, el añil pasa a Lavanda
+ *   Bricolage Grotesque (titulares) y DM Sans (texto), servidas desde la propia web
+ * Se aplica sobre los tokens de dgonmej-ui. Todos los pares de texto cumplen WCAG AA.
  */
 
 :root {
-  --brand-anil: #3d2e86;
-  --brand-platanera: #3f7d20;
-  --brand-mango: #f5b83d;
-  --brand-mango-ink: #5c3a00;
-  /* Degradado del logo: añil, granate, atardecer y mango */
-  --brand-sunset: linear-gradient(100deg, #3d2e86 0%, #a3245b 35%, #e4572e 68%, #f5a623 100%);
+  --brand-anil: #38197a;
+  --brand-ciruela: #91247b;
+  --brand-naranja: #fa681c;
+  --brand-mango: #febb08;
+  --brand-mango-ink: #4a2c00;
+  /* Degradado «Atardecer» del manual: añil, ciruela, naranja y mango */
+  --brand-sunset: linear-gradient(100deg, #38197a 0%, #91247b 35%, #fa681c 70%, #febb08 100%);
 
-  --ui-color-primary: #c2410c;
-  --ui-color-primary-hover: #9a3412;
-  --ui-color-primary-text: #c2410c;
-  --ui-color-primary-tint: rgb(194 65 12 / 0.1);
-  --ui-color-primary-glow: rgb(194 65 12 / 0.35);
-  --ui-color-focus: #c2410c;
-  --ui-gradient-primary: linear-gradient(180deg, #c2410c 0%, #9a3412 100%);
-  --ui-color-success: #3f7d20;
+  --ui-font-family: 'DM Sans Variable', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --ui-font-family-display: 'Bricolage Grotesque Variable', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --ui-color-primary: #38197a;
+  --ui-color-primary-hover: #2a1260;
+  --ui-color-primary-contrast: #ffffff;
+  --ui-color-primary-text: #91247b;
+  --ui-color-primary-tint: rgb(56 25 122 / 0.1);
+  --ui-color-primary-glow: rgb(56 25 122 / 0.35);
+  --ui-color-focus: #91247b;
+  --ui-gradient-primary: linear-gradient(180deg, #4a2596 0%, #38197a 100%);
 
   --ui-color-background: #f7f5f2;
   --ui-color-surface: #ffffff;
   --ui-color-surface-hover: #f6f2ee;
   --ui-color-surface-pressed: #eee8e2;
-  --ui-color-text: #2a2420;
-  --ui-color-text-muted: #6b625b;
+  --ui-color-text: #121016;
+  --ui-color-text-muted: #5f5850;
   --ui-color-fill: rgb(120 100 85 / 0.1);
   --ui-color-fill-strong: rgb(120 100 85 / 0.2);
   --ui-color-separator: rgb(80 60 45 / 0.14);
   --ui-color-border: rgb(80 60 45 / 0.1);
 
   --ui-gradient-ambient:
-    radial-gradient(55% 45% at 0% 0%, rgb(245 166 35 / 0.14), transparent 70%),
-    radial-gradient(50% 40% at 100% 5%, rgb(228 87 46 / 0.1), transparent 70%),
-    radial-gradient(60% 50% at 50% 100%, rgb(61 46 134 / 0.06), transparent 70%);
+    radial-gradient(55% 45% at 0% 0%, rgb(254 187 8 / 0.12), transparent 70%),
+    radial-gradient(50% 40% at 100% 5%, rgb(250 104 28 / 0.1), transparent 70%),
+    radial-gradient(60% 50% at 50% 100%, rgb(56 25 122 / 0.07), transparent 70%);
   --site-max: 1160px;
-  /* Rojo de "en directo / en antena", como el piloto de un estudio de radio */
-  --site-live: var(--ui-color-danger);
+  /* «Rojo directo» del manual: solo para lo que está sonando. El tono de texto es más oscuro para cumplir AA */
+  --site-live: #f12228;
+  --site-live-text: #c8101a;
 
   /* Bordes mas rectos que los de dgonmej-ui por defecto */
   --ui-radius-sm: 4px;
@@ -53,66 +59,72 @@
 }
 
 [data-theme='dark'] {
-  --brand-anil: #a99cf0;
-  --brand-platanera: #86d45a;
+  --brand-anil: #b096ff;
+  --brand-ciruela: #e58bd2;
 
-  --ui-color-primary: #fb923c;
-  --ui-color-primary-hover: #fdba74;
-  --ui-color-primary-text: #fb923c;
-  --ui-color-primary-tint: rgb(251 146 60 / 0.16);
-  --ui-color-primary-glow: rgb(251 146 60 / 0.3);
-  --ui-color-focus: #fb923c;
-  --ui-color-success: #86d45a;
+  --ui-color-primary: #b096ff;
+  --ui-color-primary-hover: #c6b3ff;
+  --ui-color-primary-contrast: #121016;
+  --ui-color-primary-text: #b096ff;
+  --ui-color-primary-tint: rgb(176 150 255 / 0.16);
+  --ui-color-primary-glow: rgb(176 150 255 / 0.3);
+  --ui-color-focus: #b096ff;
+  --ui-gradient-primary: linear-gradient(180deg, #c2acff 0%, #b096ff 100%);
 
-  --ui-color-background: #151210;
-  --ui-color-surface: #221d1a;
-  --ui-color-surface-hover: #2a2420;
-  --ui-color-surface-pressed: #332c27;
-  --ui-color-text: #f3eee9;
-  --ui-color-text-muted: #b3a89f;
-  --ui-color-fill: rgb(255 240 225 / 0.07);
-  --ui-color-fill-strong: rgb(255 240 225 / 0.14);
-  --ui-color-separator: rgb(255 240 225 / 0.1);
-  --ui-color-border: rgb(255 240 225 / 0.08);
-  --ui-material-bg: rgb(40 34 30 / 0.94);
-  --ui-material-bg-translucent: rgb(34 29 26 / 0.62);
+  --ui-color-background: #121016;
+  --ui-color-surface: #1c1922;
+  --ui-color-surface-hover: #24202b;
+  --ui-color-surface-pressed: #2c2734;
+  --ui-color-text: #f7f5f2;
+  --ui-color-text-muted: #b4aca4;
+  --ui-color-fill: rgb(247 245 242 / 0.07);
+  --ui-color-fill-strong: rgb(247 245 242 / 0.14);
+  --ui-color-separator: rgb(247 245 242 / 0.1);
+  --ui-color-border: rgb(247 245 242 / 0.08);
+  --ui-material-bg: rgb(32 28 38 / 0.94);
+  --ui-material-bg-translucent: rgb(28 25 34 / 0.62);
+  --site-live: #ff4d52;
+  --site-live-text: #ff6b6f;
 
   --ui-gradient-ambient:
-    radial-gradient(55% 45% at 0% 0%, rgb(245 166 35 / 0.1), transparent 70%),
-    radial-gradient(50% 40% at 100% 5%, rgb(228 87 46 / 0.1), transparent 70%),
-    radial-gradient(60% 50% at 50% 100%, rgb(169 156 240 / 0.06), transparent 70%);
+    radial-gradient(55% 45% at 0% 0%, rgb(145 36 123 / 0.16), transparent 70%),
+    radial-gradient(50% 40% at 100% 5%, rgb(250 104 28 / 0.1), transparent 70%),
+    radial-gradient(60% 50% at 50% 100%, rgb(176 150 255 / 0.07), transparent 70%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --brand-anil: #a99cf0;
-    --brand-platanera: #86d45a;
+    --brand-anil: #b096ff;
+    --brand-ciruela: #e58bd2;
 
-    --ui-color-primary: #fb923c;
-    --ui-color-primary-hover: #fdba74;
-    --ui-color-primary-text: #fb923c;
-    --ui-color-primary-tint: rgb(251 146 60 / 0.16);
-    --ui-color-primary-glow: rgb(251 146 60 / 0.3);
-    --ui-color-focus: #fb923c;
-    --ui-color-success: #86d45a;
+    --ui-color-primary: #b096ff;
+    --ui-color-primary-hover: #c6b3ff;
+    --ui-color-primary-contrast: #121016;
+    --ui-color-primary-text: #b096ff;
+    --ui-color-primary-tint: rgb(176 150 255 / 0.16);
+    --ui-color-primary-glow: rgb(176 150 255 / 0.3);
+    --ui-color-focus: #b096ff;
+    --ui-gradient-primary: linear-gradient(180deg, #c2acff 0%, #b096ff 100%);
 
-    --ui-color-background: #151210;
-    --ui-color-surface: #221d1a;
-    --ui-color-surface-hover: #2a2420;
-    --ui-color-surface-pressed: #332c27;
-    --ui-color-text: #f3eee9;
-    --ui-color-text-muted: #b3a89f;
-    --ui-color-fill: rgb(255 240 225 / 0.07);
-    --ui-color-fill-strong: rgb(255 240 225 / 0.14);
-    --ui-color-separator: rgb(255 240 225 / 0.1);
-    --ui-color-border: rgb(255 240 225 / 0.08);
-    --ui-material-bg: rgb(40 34 30 / 0.94);
-    --ui-material-bg-translucent: rgb(34 29 26 / 0.62);
+    --ui-color-background: #121016;
+    --ui-color-surface: #1c1922;
+    --ui-color-surface-hover: #24202b;
+    --ui-color-surface-pressed: #2c2734;
+    --ui-color-text: #f7f5f2;
+    --ui-color-text-muted: #b4aca4;
+    --ui-color-fill: rgb(247 245 242 / 0.07);
+    --ui-color-fill-strong: rgb(247 245 242 / 0.14);
+    --ui-color-separator: rgb(247 245 242 / 0.1);
+    --ui-color-border: rgb(247 245 242 / 0.08);
+    --ui-material-bg: rgb(32 28 38 / 0.94);
+    --ui-material-bg-translucent: rgb(28 25 34 / 0.62);
+    --site-live: #ff4d52;
+    --site-live-text: #ff6b6f;
 
     --ui-gradient-ambient:
-      radial-gradient(55% 45% at 0% 0%, rgb(245 166 35 / 0.1), transparent 70%),
-      radial-gradient(50% 40% at 100% 5%, rgb(228 87 46 / 0.1), transparent 70%),
-      radial-gradient(60% 50% at 50% 100%, rgb(169 156 240 / 0.06), transparent 70%);
+      radial-gradient(55% 45% at 0% 0%, rgb(145 36 123 / 0.16), transparent 70%),
+      radial-gradient(50% 40% at 100% 5%, rgb(250 104 28 / 0.1), transparent 70%),
+      radial-gradient(60% 50% at 50% 100%, rgb(176 150 255 / 0.07), transparent 70%);
   }
 }
 
@@ -309,12 +321,12 @@ dgonmej-ui-menu:not(:defined) {
   }
 }
 
-/* Degradados por tipo de programa (colores del logo). Texto blanco encima: todos cumplen AA. */
+/* Degradados por tipo de programa (paleta del manual). Texto blanco encima: todos cumplen AA. */
 .tono-anil {
-  background: radial-gradient(80% 80% at 20% 15%, #6b5bd0, transparent 70%), linear-gradient(160deg, #4a3a9e, #2a1f63);
+  background: radial-gradient(80% 80% at 20% 15%, #6b5bd0, transparent 70%), linear-gradient(160deg, #4a2596, #38197a);
 }
 .tono-atardecer {
-  background: radial-gradient(80% 80% at 20% 15%, #f5a623, transparent 70%), linear-gradient(160deg, #e4572e, #a8320a);
+  background: radial-gradient(80% 80% at 20% 15%, #febb08, transparent 70%), linear-gradient(160deg, #fa681c, #a8320a);
 }
 .tono-platanera {
   background: radial-gradient(80% 80% at 20% 15%, #8fd45f, transparent 70%), linear-gradient(160deg, #4f9d2a, #2a5f14);
@@ -323,5 +335,5 @@ dgonmej-ui-menu:not(:defined) {
   background: radial-gradient(80% 80% at 20% 15%, #f7c55a, transparent 70%), linear-gradient(160deg, #c98a0e, #8a5200);
 }
 .tono-granate {
-  background: radial-gradient(80% 80% at 20% 15%, #e0679a, transparent 70%), linear-gradient(160deg, #a3245b, #5e1033);
+  background: radial-gradient(80% 80% at 20% 15%, #e0679a, transparent 70%), linear-gradient(160deg, #91247b, #5e1033);
 }

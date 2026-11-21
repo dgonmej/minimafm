@@ -115,16 +115,16 @@ const base = import.meta.env.BASE_URL;
 </script>
 
 <style>
-  /* Fondo de atardecer con los colores del logo */
+  /* Fondo con el degradado «Atardecer» del manual */
   .hero {
     position: relative;
     overflow: hidden;
     padding-block: calc(var(--ui-space-8) * 1.5) calc(var(--ui-space-8) * 2);
     background:
-      radial-gradient(60% 70% at 15% 10%, rgb(245 166 35 / 0.55), transparent 70%),
-      radial-gradient(55% 65% at 85% 20%, rgb(228 87 46 / 0.5), transparent 70%),
-      radial-gradient(70% 80% at 60% 110%, rgb(163 36 91 / 0.45), transparent 70%),
-      radial-gradient(50% 60% at 0% 100%, rgb(61 46 134 / 0.4), transparent 70%),
+      radial-gradient(60% 70% at 15% 10%, rgb(254 187 8 / 0.5), transparent 70%),
+      radial-gradient(55% 65% at 85% 20%, rgb(250 104 28 / 0.5), transparent 70%),
+      radial-gradient(70% 80% at 60% 110%, rgb(145 36 123 / 0.45), transparent 70%),
+      radial-gradient(50% 60% at 0% 100%, rgb(56 25 122 / 0.4), transparent 70%),
       var(--ui-color-background);
   }
 
@@ -151,6 +151,15 @@ const base = import.meta.env.BASE_URL;
   .logo-plate :global(img) {
     width: min(240px, 56vw);
     height: auto;
+  }
+
+  /* En una sola columna (móvil y tableta) el logo va centrado */
+  @media (max-width: 899px) {
+    .logo-plate {
+      display: block;
+      width: fit-content;
+      margin-inline: auto;
+    }
   }
 
   h1 {
@@ -237,12 +246,12 @@ const base = import.meta.env.BASE_URL;
     }
   }
 
-  /* El bocadillo verde del 97.9, como en el logo */
+  /* La frecuencia, en el añil de la marca (lavanda en oscuro) */
   .frequency {
     padding: 4px 12px;
-    border-radius: 999px 999px 999px 4px;
-    color: #fff;
-    background: #3f7d20;
+    border-radius: 999px;
+    color: var(--ui-color-primary-contrast);
+    background: var(--ui-color-primary);
     font-size: var(--ui-font-size-footnote);
     font-weight: 700;
   }

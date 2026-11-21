@@ -22,66 +22,69 @@
       } catch (e) {}
     </script>
     <style>
-      /* Paleta de Mínima FM (la misma de la web): atardecer, añil y neutros cálidos */
+      /* Paleta de Mínima FM (la misma de la web, del manual de identidad) */
       :root {
         --bg: #f7f5f2;
         --surface: #ffffff;
         --fill: rgb(120 100 85 / 0.1);
-        --text: #2a2420;
-        --muted: #6b625b;
-        --primary: #c2410c;
-        --primary-text: #c2410c;
-        --tint: rgb(194 65 12 / 0.1);
+        --text: #121016;
+        --muted: #5f5850;
+        --primary: #38197a;
+        --primary-text: #91247b;
+        --on-primary: #ffffff;
+        --tint: rgb(56 25 122 / 0.1);
         --border: rgb(80 60 45 / 0.1);
         --sep: rgb(80 60 45 / 0.14);
-        --live: #d70015;
+        --live: #c8101a;
         --screen: #2a2420;
         --screen-ink: #f3eee9;
         --shadow: 0 1px 3px rgb(0 0 0 / 0.06), 0 8px 24px -8px rgb(0 0 0 / 0.14);
-        --ambient: radial-gradient(55% 45% at 0% 0%, rgb(245 166 35 / 0.14), transparent 70%),
-          radial-gradient(50% 40% at 100% 5%, rgb(228 87 46 / 0.1), transparent 70%),
-          radial-gradient(60% 50% at 50% 100%, rgb(61 46 134 / 0.06), transparent 70%);
+        --ambient: radial-gradient(55% 45% at 0% 0%, rgb(254 187 8 / 0.12), transparent 70%),
+          radial-gradient(50% 40% at 100% 5%, rgb(250 104 28 / 0.1), transparent 70%),
+          radial-gradient(60% 50% at 50% 100%, rgb(56 25 122 / 0.07), transparent 70%);
         --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
         --display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
         color-scheme: light;
       }
       :root[data-theme='dark'] {
-        --bg: #151210;
-        --surface: #221d1a;
+        --bg: #121016;
+        --surface: #1c1922;
         --fill: rgb(255 240 225 / 0.07);
         --text: #f3eee9;
         --muted: #b3a89f;
-        --primary: #fb923c;
-        --primary-text: #fb923c;
-        --tint: rgb(251 146 60 / 0.16);
+        --primary: #b096ff;
+        --primary-text: #b096ff;
+        --on-primary: #121016;
+        --tint: rgb(176 150 255 / 0.16);
         --border: rgb(255 240 225 / 0.08);
         --sep: rgb(255 240 225 / 0.1);
         --live: #ff6b62;
         --screen: #0f0d0c;
         --shadow: 0 1px 3px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
-        --ambient: radial-gradient(55% 45% at 0% 0%, rgb(245 166 35 / 0.1), transparent 70%),
-          radial-gradient(50% 40% at 100% 5%, rgb(228 87 46 / 0.1), transparent 70%),
-          radial-gradient(60% 50% at 50% 100%, rgb(169 156 240 / 0.06), transparent 70%);
+        --ambient: radial-gradient(55% 45% at 0% 0%, rgb(145 36 123 / 0.16), transparent 70%),
+          radial-gradient(50% 40% at 100% 5%, rgb(250 104 28 / 0.1), transparent 70%),
+          radial-gradient(60% 50% at 50% 100%, rgb(176 150 255 / 0.07), transparent 70%);
         color-scheme: dark;
       }
       @media (prefers-color-scheme: dark) {
         :root:not([data-theme='light']) {
-          --bg: #151210;
-          --surface: #221d1a;
+          --bg: #121016;
+          --surface: #1c1922;
           --fill: rgb(255 240 225 / 0.07);
           --text: #f3eee9;
           --muted: #b3a89f;
-          --primary: #fb923c;
-          --primary-text: #fb923c;
-          --tint: rgb(251 146 60 / 0.16);
+          --primary: #b096ff;
+          --primary-text: #b096ff;
+        --on-primary: #121016;
+          --tint: rgb(176 150 255 / 0.16);
           --border: rgb(255 240 225 / 0.08);
           --sep: rgb(255 240 225 / 0.1);
           --live: #ff6b62;
           --screen: #0f0d0c;
           --shadow: 0 1px 3px rgb(0 0 0 / 0.3), 0 8px 24px -8px rgb(0 0 0 / 0.5);
-          --ambient: radial-gradient(55% 45% at 0% 0%, rgb(245 166 35 / 0.1), transparent 70%),
-            radial-gradient(50% 40% at 100% 5%, rgb(228 87 46 / 0.1), transparent 70%),
-            radial-gradient(60% 50% at 50% 100%, rgb(169 156 240 / 0.06), transparent 70%);
+          --ambient: radial-gradient(55% 45% at 0% 0%, rgb(145 36 123 / 0.16), transparent 70%),
+            radial-gradient(50% 40% at 100% 5%, rgb(250 104 28 / 0.1), transparent 70%),
+            radial-gradient(60% 50% at 50% 100%, rgb(176 150 255 / 0.07), transparent 70%);
           color-scheme: dark;
         }
       }
@@ -226,9 +229,9 @@
         flex: none;
       }
       .btn-primary {
-        color: #fff;
-        background: linear-gradient(180deg, #c2410c 0%, #9a3412 100%);
-        box-shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 6px 14px -6px rgb(194 65 12 / 0.55);
+        color: var(--on-primary);
+        background: var(--primary);
+        box-shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 6px 14px -6px rgb(56 25 122 / 0.5);
       }
       .btn-soft {
         color: var(--primary-text);
@@ -259,8 +262,8 @@
       .listen {
         position: relative;
         overflow: hidden;
-        background: radial-gradient(70% 90% at 0% 0%, rgb(245 166 35 / 0.16), transparent 70%),
-          radial-gradient(60% 80% at 100% 100%, rgb(228 87 46 / 0.12), transparent 70%), var(--surface);
+        background: radial-gradient(70% 90% at 0% 0%, rgb(254 187 8 / 0.16), transparent 70%),
+          radial-gradient(60% 80% at 100% 100%, rgb(250 104 28 / 0.12), transparent 70%), var(--surface);
       }
       .live {
         display: inline-flex;
@@ -505,8 +508,8 @@
     </filter>
     <clipPath id="screen"><rect x="94" y="242" width="372" height="48" rx="10"/></clipPath>
     <linearGradient id="sunset" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#3d2e86"/><stop offset=".35" stop-color="#a3245b"/>
-      <stop offset=".68" stop-color="#e4572e"/><stop offset="1" stop-color="#f5a623"/>
+      <stop offset="0" stop-color="#38197a"/><stop offset=".35" stop-color="#91247b"/>
+      <stop offset=".68" stop-color="#fa681c"/><stop offset="1" stop-color="#febb08"/>
     </linearGradient>
   </defs>
 
