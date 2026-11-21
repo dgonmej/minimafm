@@ -42,17 +42,44 @@ export type Radio = {
   whatsapp: string;
   correo: string;
   direccion: string;
-  redes: { nombre: 'Facebook' | 'Instagram'; url: string }[];
+  redes: { red: RedSocial; nombre: string; url: string }[];
 };
 
+/** Redes y plataformas que se pueden enlazar desde «Emisora» en el panel, con su nombre visible */
+export const NOMBRES_REDES = {
+  facebook: 'Facebook',
+  instagram: 'Instagram',
+  youtube: 'YouTube',
+  tiktok: 'TikTok',
+  x: 'X',
+  threads: 'Threads',
+  bluesky: 'Bluesky',
+  spotify: 'Spotify',
+  ivoox: 'iVoox',
+  'apple-podcasts': 'Apple Podcasts',
+  soundcloud: 'SoundCloud',
+  twitch: 'Twitch',
+} as const;
+
+export type RedSocial = keyof typeof NOMBRES_REDES;
+
+type RadioApi = Omit<Radio, 'redes'> & { redes?: { red: RedSocial; url: string }[]; facebook?: string | null; instagram?: string | null };
+
 export async function getRadio(): Promise<Radio> {
-  const r = await get<Omit<Radio, 'redes'> & { facebook: string | null; instagram: string | null }>('/radio');
+  const r = await get<RadioApi>('/radio');
   if (!r) throw new ApiUnavailable('Faltan los datos de la emisora');
-  const { facebook, instagram, ...rest } = r;
-  const redes: Radio['redes'] = [];
-  if (facebook) redes.push({ nombre: 'Facebook', url: facebook });
-  if (instagram) redes.push({ nombre: 'Instagram', url: instagram });
-  return { ...rest, redes };
+  const { facebook, instagram, redes, ...rest } = r;
+  // Una API anterior a la lista de redes solo tenía Facebook e Instagram sueltos
+  const lista =
+    redes ??
+    [
+      facebook ? { red: 'facebook' as const, url: facebook } : null,
+      instagram ? { red: 'instagram' as const, url: instagram } : null,
+    ].filter((x) => x !== null);
+  return {
+    ...rest,
+    redes: lista.filter((x) => x.red in NOMBRES_REDES).map((x) => ({ ...x, nombre: NOMBRES_REDES[x.red] })),
+  };
 }
 
 export const getProgramas = async () => (await get<Programa[]>('/programas')) ?? [];

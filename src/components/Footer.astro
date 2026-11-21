@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import logoClaro from '../assets/logo-horizontal.png';
 import logoOscuro from '../assets/logo-horizontal-oscuro.png';
 import Icon from './Icon.astro';
+import RedIcon from './RedIcon.astro';
 import { getRadio } from '../lib/api';
 
 const radio = await getRadio();
@@ -62,8 +63,8 @@ const tel = (n: string) => n.replace(/\s/g, '');
     <p class="socials">
       {
         radio.redes.map((red) => (
-          <a href={red.url} rel="noopener noreferrer" aria-label={red.nombre}>
-            <Icon name={red.nombre === 'Facebook' ? 'facebook' : 'instagram'} />
+          <a href={red.url} rel="noopener noreferrer" aria-label={red.nombre} title={red.nombre}>
+            <RedIcon red={red.red} />
           </a>
         ))
       }
@@ -232,6 +233,7 @@ const tel = (n: string) => n.replace(/\s/g, '');
 
   .socials {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--ui-space-2);
   }
 

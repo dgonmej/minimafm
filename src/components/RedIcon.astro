@@ -1,0 +1,58 @@
+---
+/*
+ * Icono de una red social o plataforma de audio para el pie.
+ * Marcas: Simple Icons (https://simpleicons.org), licencia CC0, con su forma rellena.
+ * iVoox no está en Simple Icons: se usa el icono «podcast» de Lucide (ISC), con trazo.
+ */
+import {
+  siApplepodcasts,
+  siBluesky,
+  siFacebook,
+  siInstagram,
+  siSoundcloud,
+  siSpotify,
+  siThreads,
+  siTiktok,
+  siTwitch,
+  siX,
+  siYoutube,
+} from 'simple-icons';
+import type { RedSocial } from '../lib/api';
+
+interface Props {
+  red: RedSocial;
+  size?: number;
+}
+
+const MARCAS: Partial<Record<RedSocial, { path: string }>> = {
+  facebook: siFacebook,
+  instagram: siInstagram,
+  youtube: siYoutube,
+  tiktok: siTiktok,
+  x: siX,
+  threads: siThreads,
+  bluesky: siBluesky,
+  spotify: siSpotify,
+  'apple-podcasts': siApplepodcasts,
+  soundcloud: siSoundcloud,
+  twitch: siTwitch,
+};
+
+const { red, size = 18 } = Astro.props;
+const marca = MARCAS[red];
+---
+
+{
+  marca ? (
+    <svg class="icon" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d={marca.path} />
+    </svg>
+  ) : (
+    <svg class="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M16.85 18.58a9 9 0 1 0-9.7 0" />
+      <path d="M8 14a5 5 0 1 1 8 0" />
+      <circle cx="12" cy="11" r="1" />
+      <path d="M13 17a1 1 0 1 0-2 0l.5 4.5a.5.5 0 1 0 1 0Z" />
+    </svg>
+  )
+}
