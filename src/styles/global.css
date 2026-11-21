@@ -128,6 +128,16 @@
   }
 }
 
+/* Interruptores siempre redondos (tipo iOS), aunque el resto de controles use la redondez recta */
+dgonmej-ui-switch {
+  --ui-radius-control: 999px;
+}
+
+/* Indicadores de carga siempre en forma de disco (su forma sigue --ui-radius-scale: 1.5 o más = disco) */
+dgonmej-ui-spinner {
+  --ui-radius-scale: 1.5;
+}
+
 /* ---------- Base ---------- */
 *,
 *::before,

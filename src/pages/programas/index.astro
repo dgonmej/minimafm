@@ -1,11 +1,12 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import ProgramFeature from '../../components/ProgramFeature.astro';
+import Chips from '../../components/Chips.astro';
 import { getProgramas } from '../../lib/api';
 
 const programas = await getProgramas();
 
-const categorias = ['Todos', ...new Set(programas.map((p) => p.categoria))];
+const categorias = [...new Set(programas.map((p) => p.categoria))];
 ---
 
 <Layout title="Programas" description="Todos los programas de Mínima FM: actualidad, música, tradición, deporte y comunidad.">
@@ -17,18 +18,14 @@ const categorias = ['Todos', ...new Set(programas.map((p) => p.categoria))];
       </p>
     </header>
 
-    <dgonmej-ui-segmented-control
-      id="filter"
-      class="filter"
-      label="Filtrar por tipo de programa"
-      value="Todos"
-      data-options={JSON.stringify(categorias.map((c) => ({ value: c, label: c })))}
-    ></dgonmej-ui-segmented-control>
+    <div class="programs-filter">
+      <Chips label="Filtrar por tipo de programa" opciones={categorias} todos="Todos" objetivo=".programs > li" />
+    </div>
 
     <ul class="programs">
       {
         programas.map((p) => (
-          <li data-category={p.categoria}>
+          <li data-categoria={p.categoria}>
             <ProgramFeature programa={p} />
           </li>
         ))
@@ -41,20 +38,6 @@ const categorias = ['Todos', ...new Set(programas.map((p) => p.categoria))];
   import { enAntena, parrilla } from '../../lib/schedule';
 
   const setup = () => {
-    const filter = document.getElementById('filter') as (HTMLElement & { options: unknown }) | null;
-    if (!filter) return;
-
-    // Filtro por tipo de programa
-    customElements.whenDefined('dgonmej-ui-segmented-control').then(() => {
-      filter.options = JSON.parse(filter.dataset.options ?? '[]');
-    });
-    filter.addEventListener('ui-change', (e) => {
-      const value = (e as CustomEvent<{ value: string }>).detail.value;
-      document.querySelectorAll<HTMLElement>('.programs > li').forEach((li) => {
-        li.hidden = value !== 'Todos' && li.dataset.category !== value;
-      });
-    });
-
     // Marca "En antena" el programa que suena ahora
     const { actual } = enAntena(parrilla());
     document.querySelectorAll<HTMLElement>('[data-program]').forEach((card) => {
@@ -66,11 +49,8 @@ const categorias = ['Todos', ...new Set(programas.map((p) => p.categoria))];
 </script>
 
 <style>
-  .filter {
-    display: block;
-    max-width: 100%;
+  .programs-filter {
     margin-bottom: var(--ui-space-6);
-    overflow-x: auto;
   }
 
   /* Pocas fichas y anchas: una columna en movil y tablet, dos en escritorio */

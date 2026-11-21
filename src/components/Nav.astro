@@ -10,7 +10,7 @@ const links = [
   { href: `${base}horarios/`, label: 'Horarios', icon: 'calendar' },
   { href: `${base}eventos/`, label: 'Eventos', icon: 'star' },
   { href: `${base}noticias/`, label: 'Noticias', icon: 'bell' },
-  { href: `${base}la-radio/`, label: 'La radio', icon: 'radio' },
+  { href: `${base}la-radio/`, label: 'La Radio', icon: 'radio' },
 ];
 const path = Astro.url.pathname;
 const isCurrent = (href: string) => (href === base ? path === base : path.startsWith(href));

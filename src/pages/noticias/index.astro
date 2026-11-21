@@ -1,6 +1,7 @@
 ---
 import { getNoticias } from '../../lib/api';
 import Layout from '../../layouts/Layout.astro';
+import Chips from '../../components/Chips.astro';
 import { formatoFecha, formatoFechaLarga, iso } from '../../lib/format';
 
 const base = import.meta.env.BASE_URL;
@@ -26,14 +27,14 @@ const url = (id: string) => `${base}noticias/${id}/`;
     <header class="masthead">
       <p class="today">{hoy}</p>
       <h1 class="page-title">Noticias del Valle</h1>
-      <nav class="sections-nav" aria-label="Secciones">
-        {secciones.map((s) => <a href={`#${s.id}`}>{s.nombre}</a>)}
-      </nav>
+      <div class="sections-filter">
+        <Chips label="Filtrar por sección" opciones={secciones.map((s) => s.nombre)} todos="Todas" objetivo="[data-categoria]" />
+      </div>
     </header>
 
     {
       principal && (
-        <section class="front" aria-label="Portada">
+        <section class="front" aria-label="Portada" data-categoria="">
           <article class="lead">
             <p class="kicker">{principal.data.categoria}</p>
             <h2>
@@ -66,7 +67,7 @@ const url = (id: string) => `${base}noticias/${id}/`;
     <!-- Noticias agrupadas por secciones -->
     {
       secciones.map((s) => (
-        <section class="section-block" id={s.id} aria-labelledby={`${s.id}-titulo`}>
+        <section class="section-block" id={s.id} aria-labelledby={`${s.id}-titulo`} data-categoria={s.nombre}>
           <h2 id={`${s.id}-titulo`} class="section-title">
             {s.nombre}
             <span>{s.noticias.length === 1 ? '1 noticia' : `${s.noticias.length} noticias`}</span>
@@ -105,23 +106,8 @@ const url = (id: string) => `${base}noticias/${id}/`;
     font-size: var(--ui-font-size-subhead);
   }
 
-  .sections-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--ui-space-1) var(--ui-space-5);
+  .sections-filter {
     margin-top: var(--ui-space-3);
-  }
-
-  .sections-nav a {
-    color: var(--ui-color-text);
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  @media (hover: hover) {
-    .sections-nav a:hover {
-      color: var(--ui-color-primary-text);
-    }
   }
 
   a {

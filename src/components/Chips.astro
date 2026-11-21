@@ -1,0 +1,140 @@
+---
+/*
+ * Chips de filtro: una fila de botones para elegir una categoría y ver solo lo suyo.
+ * Lo usan Programas y Noticias, y cualquier listado que necesite filtrar por categoría.
+ *
+ *   <Chips label="Filtrar por tipo de programa" opciones={['Música', 'Deportes']} todos="Todos" objetivo=".programs > li" />
+ *
+ * - opciones: las categorías (sin la de «todos», que se añade al principio).
+ * - objetivo: selector de los elementos que se filtran. Cada uno lleva data-categoria con la suya;
+ *   los que la tienen vacía (data-categoria="") solo se ven con «todos», por ejemplo una portada.
+ * - En móvil la fila se desplaza en horizontal hasta el borde; en pantallas anchas pasa de línea.
+ * - Al cambiar lanza el evento 'chips-change' con detail = { value } (value vacío = todos).
+ */
+interface Props {
+  label: string;
+  opciones: string[];
+  todos?: string;
+  objetivo: string;
+}
+
+const { label, opciones, todos = 'Todos', objetivo } = Astro.props;
+---
+
+<div class="chips" role="group" aria-label={label} data-objetivo={objetivo}>
+  <button type="button" class="chip" data-value="" aria-pressed="true">{todos}</button>
+  {
+    opciones.map((o) => (
+      <button type="button" class="chip" data-value={o} aria-pressed="false">
+        {o}
+      </button>
+    ))
+  }
+</div>
+
+<script>
+  const setup = () => {
+    document.querySelectorAll<HTMLElement>('.chips[data-objetivo]').forEach((grupo) => {
+      if (grupo.dataset.listo) return;
+      grupo.dataset.listo = '1';
+      grupo.addEventListener('click', (e) => {
+        const chip = (e.target as HTMLElement).closest<HTMLButtonElement>('.chip');
+        if (!chip) return;
+        const value = chip.dataset.value ?? '';
+        grupo.querySelectorAll<HTMLButtonElement>('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+        chip.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+        document.querySelectorAll<HTMLElement>(grupo.dataset.objetivo!).forEach((el) => {
+          const visible = value === '' || el.dataset.categoria === value;
+          el.toggleAttribute('data-chips-oculto', !visible);
+        });
+        grupo.dispatchEvent(new CustomEvent('chips-change', { detail: { value }, bubbles: true }));
+      });
+    });
+  };
+  document.addEventListener('astro:page-load', setup);
+</script>
+
+<style is:global>
+  /* Lo que el filtro oculta (con !important por si el elemento tiene su propio display) */
+  [data-chips-oculto] {
+    display: none !important;
+  }
+</style>
+
+<style>
+  /* Fila de chips. En móvil se desplaza en horizontal y llega hasta el borde de la pantalla;
+     en pantallas anchas, si no caben, pasan a la línea siguiente */
+  .chips {
+    display: flex;
+    gap: var(--ui-space-2);
+    margin: 0 calc(var(--ui-space-4) * -1);
+    padding: 2px var(--ui-space-4);
+    overflow-x: auto;
+    scroll-padding-inline: var(--ui-space-4);
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 760px) {
+    .chips {
+      flex-wrap: wrap;
+      margin-inline: 0;
+      padding-inline: 0;
+      overflow: visible;
+    }
+  }
+
+  .chip {
+    flex: none;
+    min-height: 44px;
+    padding: 0 var(--ui-space-4);
+    border: 0;
+    border-radius: 999px;
+    color: var(--ui-color-text);
+    background: var(--ui-color-fill);
+    font: inherit;
+    font-size: var(--ui-font-size-subhead);
+    font-weight: 600;
+    white-space: nowrap;
+    scroll-snap-align: start;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      background-color var(--ui-duration-fast) ease-out,
+      color var(--ui-duration-fast) ease-out,
+      transform var(--ui-duration-fast) ease-out;
+  }
+
+  @media (hover: hover) {
+    .chip:hover:not([aria-pressed='true']) {
+      background: var(--ui-color-fill-strong);
+    }
+  }
+
+  .chip:active {
+    transform: scale(0.97);
+  }
+
+  .chip[aria-pressed='true'] {
+    color: var(--ui-color-primary-contrast);
+    background: var(--ui-color-primary);
+  }
+
+  .chip:focus-visible {
+    outline: 2px solid var(--ui-color-focus);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chip {
+      transition: none;
+    }
+    .chip:active {
+      transform: none;
+    }
+  }
+</style>
