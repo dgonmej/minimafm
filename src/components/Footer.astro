@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
-import logoFull from '../assets/logo-full.png';
+import logoClaro from '../assets/logo-horizontal.png';
+import logoOscuro from '../assets/logo-horizontal-oscuro.png';
 import Icon from './Icon.astro';
 import { getRadio } from '../lib/api';
 
@@ -15,9 +16,9 @@ const tel = (n: string) => n.replace(/\s/g, '');
   <div class="sunset" aria-hidden="true"></div>
   <div class="container grid">
     <div class="about">
-      <div class="logo-plate">
-        <Image src={logoFull} alt={`${radio.nombre} ${radio.frecuencia}, ${radio.lema}`} width={300} />
-      </div>
+      <!-- Logo horizontal sin placa, sobre el mismo fondo del pie; en oscuro, con el morado aclarado -->
+      <Image class="logo logo-claro" src={logoClaro} alt={`${radio.nombre} ${radio.frecuencia}, ${radio.lema}`} width={720} />
+      <Image class="logo logo-oscuro" src={logoOscuro} alt={`${radio.nombre} ${radio.frecuencia}, ${radio.lema}`} width={720} />
       <p>{radio.descripcion}</p>
     </div>
 
@@ -95,17 +96,32 @@ const tel = (n: string) => n.replace(/\s/g, '');
     }
   }
 
-  .logo-plate {
-    display: inline-block;
-    padding: var(--ui-space-3) var(--ui-space-4);
-    border-radius: var(--ui-radius-md);
-    background: #fffdfb;
-    box-shadow: inset 0 0 0 1px rgb(80 60 45 / 0.1);
+  .logo {
+    display: block;
+    width: min(360px, 100%);
+    height: auto;
   }
 
-  .logo-plate :global(img) {
-    width: 150px;
-    height: auto;
+  .logo-oscuro {
+    display: none;
+  }
+
+  :global([data-theme='dark']) .logo-claro {
+    display: none;
+  }
+
+  :global([data-theme='dark']) .logo-oscuro {
+    display: block;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .logo-claro {
+      display: none;
+    }
+
+    :global(:root:not([data-theme='light'])) .logo-oscuro {
+      display: block;
+    }
   }
 
   .about p {
