@@ -104,7 +104,7 @@ const tel = (n: string) => n.replace(/\s/g, '');
       <dgonmej-ui-button variant="secondary" href={`${base}noticias/`}>Todas las noticias</dgonmej-ui-button>
     </div>
     <div class="news">
-      {destacada && <NewsCard noticia={destacada} destacada />}
+      {destacada && <NewsCard noticia={destacada} destacada prioritaria />}
       <div class="news-side">
         {otras.map((n) => <NewsCard noticia={n} />)}
       </div>

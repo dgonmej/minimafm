@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
+import Foto from '../../components/Foto.astro';
 import { dias } from '../../data/radio';
 import { getProgramas, getRadio } from '../../lib/api';
 import { describirFranja, iconoPrograma, tonoPrograma } from '../../lib/format';
@@ -18,10 +19,11 @@ const tel = (n: string) => n.replace(/\s/g, '');
 const mismoTipo = programas.filter((p) => p.categoria === programa.categoria && p.id !== programa.id);
 ---
 
-<Layout title={programa.nombre} description={programa.descripcion}>
+<Layout title={programa.nombre} description={programa.descripcion} imagen={programa.imagen}>
   <!-- Cabecera a todo lo ancho con el color del tipo de programa -->
   <header class:list={['band', tonoPrograma[programa.categoria]]}>
-    <div class="container band-inner">
+    <div class:list={['container band-inner', { 'con-foto': programa.imagen }]}>
+      <div class="band-texto">
       <a class="back" href={`${base}programas/`}>
         <dgonmej-ui-icon name="chevron-left" size="16"></dgonmej-ui-icon>Programas
       </a>
@@ -39,6 +41,8 @@ const mismoTipo = programas.filter((p) => p.categoria === programa.categoria && 
           <strong>{programa.presentador}</strong>
         </span>
       </div>
+      </div>
+      {programa.imagen && <Foto class="band-foto" imagen={programa.imagen} proporcion="1 / 1" prioritaria sizes="(min-width: 900px) 280px, 200px" />}
       <Icon name={iconoPrograma[programa.categoria]} size={220} />
     </div>
   </header>
@@ -179,6 +183,43 @@ const mismoTipo = programas.filter((p) => p.categoria === programa.categoria && 
     gap: var(--ui-space-3);
     justify-items: start;
     padding-block: var(--ui-space-6) calc(var(--ui-space-8) * 1.5);
+  }
+
+  .band-texto {
+    display: grid;
+    gap: var(--ui-space-3);
+    justify-items: start;
+  }
+
+  /* Con foto: texto a la izquierda y la foto cuadrada a la derecha (debajo en móvil) */
+  .band-inner.con-foto {
+    align-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .band-inner.con-foto {
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: var(--ui-space-8);
+      /* La ficha «Cuándo escucharlo» sube sobre la banda: hueco para que no tape la foto */
+      padding-bottom: calc(var(--ui-space-8) * 3.5);
+    }
+  }
+
+  .band-inner :global(.band-foto) {
+    width: 100%;
+    max-width: 280px;
+    border-radius: var(--ui-radius-lg);
+    box-shadow: var(--ui-shadow-lg);
+  }
+
+  @media (max-width: 899px) {
+    .band-inner :global(.band-foto) {
+      max-width: 200px;
+    }
+  }
+
+  .band-inner.con-foto > :global(.icon:last-child) {
+    display: none;
   }
 
   /* Icono enorme de fondo, como una marca de agua */

@@ -2,6 +2,7 @@
 import { getEventos, type Evento } from '../../lib/api';
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
+import Foto from '../../components/Foto.astro';
 import { formatoFecha, formatoFechaLarga, iconoEvento, iso } from '../../lib/format';
 
 const base = import.meta.env.BASE_URL;
@@ -67,7 +68,7 @@ const plural = (n: number) => (n === 1 ? '1 evento' : `${n} eventos`);
             <ol class="rows">
               {g.eventos.map((e) => (
                 <li>
-                  <a class="row" href={`${base}eventos/${e.id}/`}>
+                  <a class:list={['row', { 'con-foto': e.data.imagen }]} href={`${base}eventos/${e.id}/`}>
                     <time class="date" datetime={iso(e.data.fecha)} aria-label={formatoFechaLarga(e.data.fecha)}>
                       <span class="weekday">{diaSemana.format(e.data.fecha).replace('.', '')}</span>
                       <span class="day">{diaMes.format(e.data.fecha)}</span>
@@ -84,6 +85,7 @@ const plural = (n: number) => (n === 1 ? '1 evento' : `${n} eventos`);
                         <span><Icon name="map-pin" size={16} />{e.data.lugar}</span>
                       </p>
                     </div>
+                    {e.data.imagen && <Foto class="miniatura" imagen={e.data.imagen} proporcion="4 / 5" decorativa sizes="96px" />}
                     <dgonmej-ui-icon class="chevron" name="chevron-right" size="20" />
                   </a>
                 </li>
@@ -268,6 +270,21 @@ const plural = (n: number) => (n === 1 ? '1 evento' : `${n} eventos`);
     color: var(--ui-color-text);
     text-decoration: none;
     transition: background-color var(--ui-duration-fast) var(--ui-ease-standard);
+  }
+
+  /* Con cartel: miniatura vertical antes de la flecha */
+  .row.con-foto {
+    grid-template-columns: 64px minmax(0, 1fr) 96px auto;
+  }
+
+  .row :global(.miniatura) {
+    border-radius: var(--ui-radius-sm);
+  }
+
+  @media (max-width: 479px) {
+    .row.con-foto {
+      grid-template-columns: 56px minmax(0, 1fr) 64px;
+    }
   }
 
   @media (hover: hover) {

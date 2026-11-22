@@ -2,6 +2,7 @@
 import Icon from './Icon.astro';
 import { describirFranja, iconoPrograma } from '../lib/format';
 import type { Programa } from '../data/radio';
+import { urlImagen } from '../lib/imagen';
 
 interface Props {
   programa: Programa;
@@ -12,7 +13,7 @@ const { programa } = Astro.props;
 
 <dgonmej-ui-card class="program" id={programa.id}>
   <div slot="header" class="host">
-    <dgonmej-ui-avatar size="sm" name={programa.presentador}></dgonmej-ui-avatar>
+    <dgonmej-ui-avatar size="sm" name={programa.presentador} src={programa.imagen ? urlImagen(programa.imagen, 480) : undefined}></dgonmej-ui-avatar>
     <span>{programa.presentador}</span>
   </div>
   <p class="category">

@@ -8,14 +8,17 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import PlayerBar from '../components/PlayerBar.astro';
 import { getProgramas, getRadio } from '../lib/api';
+import { altoPara, urlImagen, type Imagen } from '../lib/imagen';
 
 interface Props {
   title?: string;
   description?: string;
+  /** Foto de la página (p. ej. la de una noticia): se usa al compartir en lugar de la general */
+  imagen?: Imagen | null;
 }
 
 const radio = await getRadio();
-const { title, description = radio.descripcion } = Astro.props;
+const { title, description = radio.descripcion, imagen } = Astro.props;
 // Programas para calcular en el navegador lo que suena ahora (ver parrilla() en lib/schedule.ts)
 const parrilla = (await getProgramas()).map(({ id, nombre, presentador, franjas }) => ({ id, nombre, presentador, franjas }));
 const fullTitle = title ? `${title} | ${radio.nombre} ${radio.frecuencia}` : `${radio.nombre} ${radio.frecuencia} | La voz del Valle`;
@@ -23,9 +26,18 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const siteName = `${radio.nombre} ${radio.frecuencia}`;
 
-// Imagen al compartir (1200 x 630, en public/og.png) y datos de la emisora para Google
+// Imagen al compartir: la foto de la página si la tiene (en su ancho de 1600 o el mayor que haya)
+// o la general (1200 x 630, en public/og.png). Y datos de la emisora para Google.
+const ogFoto = imagen ? urlImagen(imagen, 1600) : null;
+const ogAncho = imagen ? Number(ogFoto!.match(/-(\d+)\.webp$/)![1]) : 1200;
+const share = {
+  url: new URL(ogFoto ?? '/og.png', Astro.site).href,
+  type: imagen ? 'image/webp' : 'image/png',
+  width: ogAncho,
+  height: imagen ? altoPara(imagen, ogAncho) : 630,
+  alt: imagen?.alt ?? `${siteName}, la radio del ${radio.zona}`,
+};
 const image = new URL('/og.png', Astro.site).href;
-const imageAlt = `${siteName}, la radio del ${radio.zona}`;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'RadioStation',
@@ -57,16 +69,16 @@ const jsonLd = {
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content="es_ES" />
     <meta property="og:site_name" content={siteName} />
-    <meta property="og:image" content={image} />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={imageAlt} />
+    <meta property="og:image" content={share.url} />
+    <meta property="og:image:type" content={share.type} />
+    <meta property="og:image:width" content={String(share.width)} />
+    <meta property="og:image:height" content={String(share.height)} />
+    <meta property="og:image:alt" content={share.alt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={image} />
-    <meta name="twitter:image:alt" content={imageAlt} />
+    <meta name="twitter:image" content={share.url} />
+    <meta name="twitter:image:alt" content={share.alt} />
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
     <link rel="icon" type="image/png" sizes="32x32" href={`${base}/favicon-32x32.png`} />

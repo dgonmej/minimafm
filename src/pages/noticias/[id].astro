@@ -3,15 +3,16 @@ import { getNoticia } from '../../lib/api';
 import { renderMarkdown } from '../../lib/markdown';
 import Layout from '../../layouts/Layout.astro';
 import { formatoFechaLarga, iso } from '../../lib/format';
+import Foto from '../../components/Foto.astro';
 
 const noticia = await getNoticia(Astro.params.id!);
 if (!noticia) return Astro.rewrite('/404/');
 const { html } = renderMarkdown(noticia.cuerpo);
-const { titulo, fecha, categoria, autor, resumen } = noticia.data;
+const { titulo, fecha, categoria, autor, resumen, imagen } = noticia.data;
 const base = import.meta.env.BASE_URL;
 ---
 
-<Layout title={titulo} description={resumen}>
+<Layout title={titulo} description={resumen} imagen={imagen}>
   <article class="container article">
     <dgonmej-ui-button variant="ghost" size="small" href={`${base}noticias/`}>
       <dgonmej-ui-icon name="chevron-left" size="16"></dgonmej-ui-icon>Noticias
@@ -29,6 +30,8 @@ const base = import.meta.env.BASE_URL;
         </span>
       </p>
     </header>
+
+    {imagen && <Foto class="portada" imagen={imagen} prioritaria sizes="(min-width: 760px) 720px, 100vw" />}
 
     <div class="prose">
       <Fragment set:html={html} />
@@ -79,6 +82,11 @@ const base = import.meta.env.BASE_URL;
 
   .byline time {
     color: var(--ui-color-text-muted);
+  }
+
+  .article :global(.portada) {
+    margin-bottom: var(--ui-space-6);
+    border-radius: var(--ui-radius-lg);
   }
 
   .prose {

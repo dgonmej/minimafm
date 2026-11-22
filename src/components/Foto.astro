@@ -1,0 +1,48 @@
+---
+/*
+ * Imagen subida desde el panel, adaptada a la pantalla (srcset con sus anchos) y recortada a la
+ * proporción que pida cada sitio. Lleva su texto alternativo y reserva su hueco al cargar.
+ *   <Foto imagen={noticia.data.imagen} sizes="(min-width: 900px) 720px, 100vw" proporcion="16 / 9" />
+ */
+import { altoPara, srcsetImagen, urlImagen, type Imagen } from '../lib/imagen';
+
+interface Props {
+  imagen: Imagen;
+  /** Qué ancho ocupa en pantalla, para que el navegador elija el archivo justo */
+  sizes: string;
+  proporcion?: string;
+  /** La primera imagen visible de la página se carga enseguida; el resto, al acercarse */
+  prioritaria?: boolean;
+  /** Acompaña a un texto que ya dice lo mismo (miniatura junto al título): sin texto alternativo */
+  decorativa?: boolean;
+  class?: string;
+  slot?: string;
+}
+
+const { imagen, sizes, proporcion = '16 / 9', prioritaria = false, decorativa = false, class: clase, slot } = Astro.props;
+---
+
+<img
+  class:list={['foto', clase]}
+  slot={slot}
+  src={urlImagen(imagen, 960)}
+  srcset={srcsetImagen(imagen)}
+  sizes={sizes}
+  width={960}
+  height={altoPara(imagen, 960)}
+  alt={decorativa ? '' : imagen.alt}
+  loading={prioritaria ? 'eager' : 'lazy'}
+  fetchpriority={prioritaria ? 'high' : undefined}
+  decoding="async"
+  style={`aspect-ratio: ${proporcion}`}
+/>
+
+<style>
+  .foto {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    background: var(--ui-color-fill);
+  }
+</style>

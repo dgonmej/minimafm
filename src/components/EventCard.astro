@@ -1,6 +1,7 @@
 ---
 import type { Evento } from '../lib/api';
 import Icon from './Icon.astro';
+import Foto from './Foto.astro';
 import { iconoEvento, partesFecha, formatoFechaLarga, iso } from '../lib/format';
 
 interface Props {
@@ -8,12 +9,14 @@ interface Props {
 }
 
 const { evento } = Astro.props;
-const { titulo, fecha, hora, lugar, categoria, resumen } = evento.data;
+const { titulo, fecha, hora, lugar, categoria, resumen, imagen } = evento.data;
 const { dia, mes } = partesFecha(fecha);
 const href = `${import.meta.env.BASE_URL}eventos/${evento.id}/`;
 ---
 
 <dgonmej-ui-card class="event" href={href} interactive>
+  {/* En la tarjeta, el cartel recortado a 16:9 (como las noticias) para que la fila no se descuadre */}
+  {imagen && <Foto slot="media" class="cartel-recorte" imagen={imagen} sizes="(min-width: 1100px) 340px, (min-width: 640px) 45vw, 100vw" />}
   <div slot="header" class="head">
     <time class="date" datetime={iso(fecha)} aria-label={formatoFechaLarga(fecha)}>
       <span class="day">{dia}</span>
@@ -33,6 +36,11 @@ const href = `${import.meta.env.BASE_URL}eventos/${evento.id}/`;
 </dgonmej-ui-card>
 
 <style>
+  /* Los carteles suelen llevar lo importante arriba: el recorte se centra un poco más alto */
+  .event :global(.cartel-recorte) {
+    object-position: center 30%;
+  }
+
   .event {
     height: 100%;
   }

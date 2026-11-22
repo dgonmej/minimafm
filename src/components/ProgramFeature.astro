@@ -6,6 +6,7 @@
 import Icon from './Icon.astro';
 import { describirFranja, iconoPrograma, tonoPrograma } from '../lib/format';
 import type { Programa } from '../data/radio';
+import Foto from './Foto.astro';
 
 interface Props {
   programa: Programa;
@@ -17,9 +18,15 @@ const ficha = `${base}programas/${programa.id}/`;
 ---
 
 <dgonmej-ui-card class="feature" id={programa.id} layout="horizontal" data-program={programa.id}>
-  <div slot="media" class:list={['panel', tonoPrograma[programa.categoria]]} aria-hidden="true">
-    <Icon name={iconoPrograma[programa.categoria]} size={56} />
-  </div>
+  {
+    programa.imagen ? (
+      <Foto slot="media" class="panel-foto" imagen={programa.imagen} proporcion="auto" sizes="(min-width: 900px) 400px, 100vw" />
+    ) : (
+      <div slot="media" class:list={['panel', tonoPrograma[programa.categoria]]} aria-hidden="true">
+        <Icon name={iconoPrograma[programa.categoria]} size={56} />
+      </div>
+    )
+  }
 
   <div slot="header" class="host">
     <dgonmej-ui-avatar size="md" name={programa.presentador}></dgonmej-ui-avatar>
@@ -71,6 +78,12 @@ const ficha = `${base}programas/${programa.id}/`;
   }
 
   /* Franja de color segun el tipo de programa (colores del logo) */
+  /* Foto del programa en lugar del panel de color: llena el lateral (o una franja si va apilada) */
+  .feature :global(.panel-foto) {
+    height: 100%;
+    min-height: 200px;
+  }
+
   .panel {
     display: grid;
     place-items: center;

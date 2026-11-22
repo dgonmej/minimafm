@@ -4,6 +4,8 @@
  */
 
 /** Dias de la semana, empezando en lunes (indice 0). */
+import type { Imagen } from '../lib/imagen';
+
 export const dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] as const;
 
 export type Franja = { dias: number[]; inicio: string; fin: string };
@@ -17,6 +19,8 @@ export type Programa = {
   /** Secciones habituales del programa */
   secciones: string[];
   franjas: Franja[];
+  /** Portada del programa o foto de quien lo presenta (opcional) */
+  imagen?: Imagen | null;
 };
 
 /** Programa que suena cuando no hay ninguno en antena. */

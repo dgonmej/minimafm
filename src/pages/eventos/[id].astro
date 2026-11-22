@@ -3,16 +3,17 @@ import { getEvento } from '../../lib/api';
 import { renderMarkdown } from '../../lib/markdown';
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
+import Foto from '../../components/Foto.astro';
 import { formatoFechaLarga, iconoEvento, iso } from '../../lib/format';
 
 const evento = await getEvento(Astro.params.id!);
 if (!evento) return Astro.rewrite('/404/');
 const { html } = renderMarkdown(evento.cuerpo);
-const { titulo, fecha, hora, lugar, categoria, resumen } = evento.data;
+const { titulo, fecha, hora, lugar, categoria, resumen, imagen } = evento.data;
 const base = import.meta.env.BASE_URL;
 ---
 
-<Layout title={titulo} description={resumen}>
+<Layout title={titulo} description={resumen} imagen={imagen}>
   <article class="container article">
     <dgonmej-ui-button variant="ghost" size="small" href={`${base}eventos/`}>
       <dgonmej-ui-icon name="chevron-left" size="16"></dgonmej-ui-icon>Agenda
@@ -30,6 +31,8 @@ const base = import.meta.env.BASE_URL;
       <li><Icon name="map-pin" />{lugar}</li>
     </ul>
 
+    {imagen && <Foto class="cartel" imagen={imagen} proporcion="4 / 5" prioritaria sizes="(min-width: 640px) 360px, 100vw" />}
+
     <div class="prose">
       <Fragment set:html={html} />
     </div>
@@ -37,6 +40,14 @@ const base = import.meta.env.BASE_URL;
 </Layout>
 
 <style>
+  /* Cartel del evento: estrecho y centrado, que no ocupe toda la pantalla al ser vertical */
+  .article :global(.cartel) {
+    max-width: 360px;
+    margin: 0 auto var(--ui-space-6);
+    border-radius: var(--ui-radius-lg);
+    box-shadow: var(--ui-shadow-md);
+  }
+
   .article {
     max-width: 760px;
     padding-block: var(--ui-space-6) var(--ui-space-8);

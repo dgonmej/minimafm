@@ -1,4 +1,5 @@
 ---
+import { urlImagen } from '../../lib/imagen';
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
 import { getEquipo, getHistoria, getProgramas, getRadio } from '../../lib/api';
@@ -69,7 +70,7 @@ const tel = (n: string) => n.replace(/\s/g, '');
       {
         equipoFijo.map((p) => (
           <li>
-            <dgonmej-ui-avatar size="xl" name={p.nombre}></dgonmej-ui-avatar>
+            <dgonmej-ui-avatar size="xl" name={p.nombre} src={p.imagen ? urlImagen(p.imagen, 480) : undefined}></dgonmej-ui-avatar>
             <strong>{p.nombre}</strong>
             <span>{p.papel}</span>
           </li>

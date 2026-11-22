@@ -2,6 +2,7 @@
 import { getNoticias } from '../../lib/api';
 import Layout from '../../layouts/Layout.astro';
 import Chips from '../../components/Chips.astro';
+import Foto from '../../components/Foto.astro';
 import { formatoFecha, formatoFechaLarga, iso } from '../../lib/format';
 
 const base = import.meta.env.BASE_URL;
@@ -36,6 +37,11 @@ const url = (id: string) => `${base}noticias/${id}/`;
       principal && (
         <section class="front" aria-label="Portada" data-categoria="">
           <article class="lead">
+            {principal.data.imagen && (
+              <a class="foto-enlace" href={url(principal.id)} tabindex="-1" aria-hidden="true">
+                <Foto class="lead-foto" imagen={principal.data.imagen} prioritaria sizes="(min-width: 1000px) 720px, 100vw" />
+              </a>
+            )}
             <p class="kicker">{principal.data.categoria}</p>
             <h2>
               <a href={url(principal.id)}>{principal.data.titulo}</a>
@@ -75,6 +81,11 @@ const url = (id: string) => `${base}noticias/${id}/`;
           <div class="columns">
             {s.noticias.map((n) => (
               <article class="story">
+                {n.data.imagen && (
+                  <a class="foto-enlace" href={url(n.id)} tabindex="-1" aria-hidden="true">
+                    <Foto class="story-foto" imagen={n.data.imagen} sizes="(min-width: 1000px) 340px, (min-width: 640px) 45vw, 100vw" />
+                  </a>
+                )}
                 <h3>
                   <a href={url(n.id)}>{n.data.titulo}</a>
                 </h3>
@@ -122,6 +133,39 @@ const url = (id: string) => `${base}noticias/${id}/`;
       text-decoration: underline;
       text-decoration-thickness: 2px;
       text-underline-offset: 4px;
+    }
+  }
+
+  /* Fotos: la de portada y la de cada noticia de sección, con el mismo enlace que su titular
+     (fuera del orden de tabulación para no repetirlo) */
+  .foto-enlace {
+    display: block;
+    overflow: hidden;
+    border-radius: var(--ui-radius-md);
+  }
+
+  .lead-foto,
+  .story-foto {
+    transition: transform var(--ui-duration-slow) var(--ui-ease-standard);
+  }
+
+  .foto-enlace:has(.lead-foto) {
+    margin-bottom: var(--ui-space-4);
+  }
+
+  .foto-enlace:has(.story-foto) {
+    margin-bottom: var(--ui-space-3);
+  }
+
+  @media (hover: hover) {
+    .foto-enlace:hover :global(.foto) {
+      transform: scale(1.03);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .foto-enlace:hover :global(.foto) {
+      transform: none;
     }
   }
 

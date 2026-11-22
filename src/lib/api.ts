@@ -5,6 +5,7 @@
  * Eventos, noticias y paginas se devuelven con la misma forma que tenian las colecciones de
  * contenido de Astro ({ id, data, cuerpo }), asi las plantillas apenas cambian.
  */
+import type { Imagen } from './imagen';
 import type { Programa } from '../data/radio';
 
 const API_URL = (process.env.API_URL ?? import.meta.env.API_URL ?? 'http://localhost:3000').replace(/\/$/, '');
@@ -99,6 +100,8 @@ export type Evento = Entry<{
   lugar: string;
   categoria: 'Fiestas' | 'Música' | 'Mercado' | 'Naturaleza' | 'Solidario' | 'Cultura';
   resumen: string;
+  /** Cartel o foto (opcional; con una API antigua no llega) */
+  imagen: Imagen | null;
 }>;
 
 export type Noticia = Entry<{
@@ -107,14 +110,24 @@ export type Noticia = Entry<{
   categoria: 'La radio' | 'Municipio' | 'Deportes' | 'Cultura' | 'Solidaridad';
   autor: string;
   resumen: string;
+  /** Foto subida desde el panel (opcional; con una API antigua no llega) */
+  imagen: Imagen | null;
 }>;
 
 export type Pagina = Entry<{ titulo: string; resumen: string; orden: number; actualizado: Date }>;
 
 type Raw = Record<string, unknown> & { id: string; cuerpo?: string };
 
-const toEvento = ({ id, cuerpo = '', ...d }: Raw): Evento => ({ id, cuerpo, data: { ...(d as Evento['data']), fecha: fecha(d.fecha as string) } });
-const toNoticia = ({ id, cuerpo = '', ...d }: Raw): Noticia => ({ id, cuerpo, data: { ...(d as Noticia['data']), fecha: fecha(d.fecha as string) } });
+const toEvento = ({ id, cuerpo = '', ...d }: Raw): Evento => ({
+  id,
+  cuerpo,
+  data: { ...(d as Evento['data']), fecha: fecha(d.fecha as string), imagen: (d.imagen as Imagen | null | undefined) ?? null },
+});
+const toNoticia = ({ id, cuerpo = '', ...d }: Raw): Noticia => ({
+  id,
+  cuerpo,
+  data: { ...(d as Noticia['data']), fecha: fecha(d.fecha as string), imagen: (d.imagen as Imagen | null | undefined) ?? null },
+});
 const toPagina = ({ id, cuerpo = '', ...d }: Raw): Pagina => ({ id, cuerpo, data: { ...(d as Pagina['data']), actualizado: new Date(d.actualizado as string) } });
 
 export const getEventos = async () => ((await get<Raw[]>('/eventos')) ?? []).map(toEvento);
@@ -133,7 +146,7 @@ export const getPaginas = async () => ((await get<Raw[]>('/paginas')) ?? []).map
 
 // ---------- La radio y publicidad ----------
 
-export type Persona = { nombre: string; papel: string };
+export type Persona = { nombre: string; papel: string; imagen?: Imagen | null };
 export type Hito = { anio: string; titulo: string; texto: string };
 export type Tarifa = { nombre: string; horario: string; precio20: number; precio30: number; destacada: boolean };
 export type Formato = { nombre: string; precio: string; unidad: string; texto: string; icono: 'shopping-basket' | 'mic' | 'message-circle' | 'party-popper' };
