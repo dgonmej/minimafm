@@ -8,7 +8,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check": "astro check"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.11",
@@ -20,6 +21,10 @@
     "simple-icons": "^16.38.0"
   },
   "devDependencies": {
-    "@playwright/test": "1.65.1"
+    "@astrojs/check": "^0.9.12",
+    "@playwright/test": "1.65.1",
+    "@types/node": "^24.19.2",
+    "typescript": "^5.9.3",
+    "zod": "^4.6.7"
   }
 }

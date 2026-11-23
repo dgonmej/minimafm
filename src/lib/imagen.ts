@@ -2,7 +2,9 @@
  * Imágenes subidas desde el panel. La API devuelve { id, alt, ancho, alto, anchos } y cada ancho
  * está en /media/{id}-{ancho}.webp (lo sirve nginx en el mismo dominio que la web).
  */
-export type Imagen = { id: string; alt: string; ancho: number; alto: number; anchos: number[] };
+import type { Imagen } from '../contrato/tipos';
+
+export type { Imagen };
 
 /** Ruta del ancho más cercano por encima del pedido (o el mayor que haya) */
 export const urlImagen = (img: Imagen, ancho: number) =>

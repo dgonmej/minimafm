@@ -5,8 +5,9 @@
  * Eventos, noticias y paginas se devuelven con la misma forma que tenian las colecciones de
  * contenido de Astro ({ id, data, cuerpo }), asi las plantillas apenas cambian.
  */
-import type { Imagen } from './imagen';
 import type { Programa } from '../data/radio';
+import { nombresRedes, type RedSocial } from '../contrato/catalogos';
+import type { Publico, Radio as RadioApiActual } from '../contrato/tipos';
 
 const API_URL = (process.env.API_URL ?? import.meta.env.API_URL ?? 'http://localhost:3000').replace(/\/$/, '');
 const TTL = 15_000;
@@ -32,39 +33,15 @@ async function get<T>(path: string): Promise<T> {
 
 // ---------- Emisora ----------
 
-export type Radio = {
-  nombre: string;
-  frecuencia: string;
-  lema: string;
-  zona: string;
-  descripcion: string;
-  stream: string;
-  telefono: string;
-  whatsapp: string;
-  correo: string;
-  direccion: string;
-  redes: { red: RedSocial; nombre: string; url: string }[];
-};
+/** La emisora, con el nombre visible de cada red */
+export type Radio = Omit<RadioApiActual, 'redes'> & { redes: { red: RedSocial; nombre: string; url: string }[] };
 
-/** Redes y plataformas que se pueden enlazar desde «Emisora» en el panel, con su nombre visible */
-export const NOMBRES_REDES = {
-  facebook: 'Facebook',
-  instagram: 'Instagram',
-  youtube: 'YouTube',
-  tiktok: 'TikTok',
-  x: 'X',
-  threads: 'Threads',
-  bluesky: 'Bluesky',
-  spotify: 'Spotify',
-  ivoox: 'iVoox',
-  'apple-podcasts': 'Apple Podcasts',
-  soundcloud: 'SoundCloud',
-  twitch: 'Twitch',
-} as const;
+/** Nombre visible de cada red (el del contrato de la API) */
+export const NOMBRES_REDES = nombresRedes;
+export type { RedSocial };
 
-export type RedSocial = keyof typeof NOMBRES_REDES;
-
-type RadioApi = Omit<Radio, 'redes'> & { redes?: { red: RedSocial; url: string }[]; facebook?: string | null; instagram?: string | null };
+// Una API anterior a la lista de redes solo tenía Facebook e Instagram sueltos
+type RadioApi = Omit<RadioApiActual, 'redes'> & { redes?: RadioApiActual['redes']; facebook?: string | null; instagram?: string | null };
 
 export async function getRadio(): Promise<Radio> {
   const r = await get<RadioApi>('/radio');
@@ -93,63 +70,38 @@ const fecha = (s: string) => new Date(`${s}T00:00:00Z`);
 
 type Entry<D> = { id: string; data: D; cuerpo: string };
 
-export type Evento = Entry<{
-  titulo: string;
-  fecha: Date;
-  hora: string;
-  lugar: string;
-  categoria: 'Fiestas' | 'Música' | 'Mercado' | 'Naturaleza' | 'Solidario' | 'Cultura';
-  resumen: string;
-  /** Cartel o foto (opcional; con una API antigua no llega) */
-  imagen: Imagen | null;
-}>;
+/** Lo que la web usa de cada contenido: los campos de la API (ver src/contrato) con las fechas como Date */
+type Datos<R extends 'eventos' | 'noticias'> = Omit<Publico<R>, 'id' | 'cuerpo' | 'fecha'> & { fecha: Date };
 
-export type Noticia = Entry<{
-  titulo: string;
-  fecha: Date;
-  categoria: 'La radio' | 'Municipio' | 'Deportes' | 'Cultura' | 'Solidaridad';
-  autor: string;
-  resumen: string;
-  /** Foto subida desde el panel (opcional; con una API antigua no llega) */
-  imagen: Imagen | null;
-}>;
+export type Evento = Entry<Datos<'eventos'>>;
+export type Noticia = Entry<Datos<'noticias'>>;
+export type Pagina = Entry<Omit<Publico<'paginas'>, 'id' | 'cuerpo' | 'actualizado'> & { actualizado: Date }>;
 
-export type Pagina = Entry<{ titulo: string; resumen: string; orden: number; actualizado: Date }>;
+// La imagen puede faltar si la API es anterior a las imágenes
+const toEvento = ({ id, cuerpo, ...d }: Publico<'eventos'>): Evento => ({ id, cuerpo, data: { ...d, fecha: fecha(d.fecha), imagen: d.imagen ?? null } });
+const toNoticia = ({ id, cuerpo, ...d }: Publico<'noticias'>): Noticia => ({ id, cuerpo, data: { ...d, fecha: fecha(d.fecha), imagen: d.imagen ?? null } });
+const toPagina = ({ id, cuerpo, ...d }: Publico<'paginas'>): Pagina => ({ id, cuerpo, data: { ...d, actualizado: new Date(d.actualizado) } });
 
-type Raw = Record<string, unknown> & { id: string; cuerpo?: string };
-
-const toEvento = ({ id, cuerpo = '', ...d }: Raw): Evento => ({
-  id,
-  cuerpo,
-  data: { ...(d as Evento['data']), fecha: fecha(d.fecha as string), imagen: (d.imagen as Imagen | null | undefined) ?? null },
-});
-const toNoticia = ({ id, cuerpo = '', ...d }: Raw): Noticia => ({
-  id,
-  cuerpo,
-  data: { ...(d as Noticia['data']), fecha: fecha(d.fecha as string), imagen: (d.imagen as Imagen | null | undefined) ?? null },
-});
-const toPagina = ({ id, cuerpo = '', ...d }: Raw): Pagina => ({ id, cuerpo, data: { ...(d as Pagina['data']), actualizado: new Date(d.actualizado as string) } });
-
-export const getEventos = async () => ((await get<Raw[]>('/eventos')) ?? []).map(toEvento);
+export const getEventos = async () => ((await get<Publico<'eventos'>[]>('/eventos')) ?? []).map(toEvento);
 export const getEvento = async (id: string) => {
-  const r = await get<Raw | null>(`/eventos/${encodeURIComponent(id)}`);
+  const r = await get<Publico<'eventos'> | null>(`/eventos/${encodeURIComponent(id)}`);
   return r ? toEvento(r) : null;
 };
 
-export const getNoticias = async () => ((await get<Raw[]>('/noticias')) ?? []).map(toNoticia);
+export const getNoticias = async () => ((await get<Publico<'noticias'>[]>('/noticias')) ?? []).map(toNoticia);
 export const getNoticia = async (id: string) => {
-  const r = await get<Raw | null>(`/noticias/${encodeURIComponent(id)}`);
+  const r = await get<Publico<'noticias'> | null>(`/noticias/${encodeURIComponent(id)}`);
   return r ? toNoticia(r) : null;
 };
 
-export const getPaginas = async () => ((await get<Raw[]>('/paginas')) ?? []).map(toPagina);
+export const getPaginas = async () => ((await get<Publico<'paginas'>[]>('/paginas')) ?? []).map(toPagina);
 
 // ---------- La radio y publicidad ----------
 
-export type Persona = { nombre: string; papel: string; imagen?: Imagen | null };
-export type Hito = { anio: string; titulo: string; texto: string };
-export type Tarifa = { nombre: string; horario: string; precio20: number; precio30: number; destacada: boolean };
-export type Formato = { nombre: string; precio: string; unidad: string; texto: string; icono: 'shopping-basket' | 'mic' | 'message-circle' | 'party-popper' };
+export type Persona = Publico<'equipo'>;
+export type Hito = Publico<'historia'>;
+export type Tarifa = Publico<'tarifas'>;
+export type Formato = Publico<'formatos'>;
 
 export const getEquipo = async () => (await get<Persona[]>('/equipo')) ?? [];
 export const getHistoria = async () => (await get<Hito[]>('/historia')) ?? [];
