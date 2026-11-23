@@ -106,6 +106,9 @@ const url = (id: string) => `${base}noticias/${id}/`;
   /* ---------- Cabecera ---------- */
   .masthead {
     display: grid;
+    /* Una columna que no crece con su contenido: los chips de secciones se desplazan dentro de su fila
+       en vez de ensanchar la página en el móvil */
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--ui-space-2);
     padding-block: var(--ui-space-8) var(--ui-space-4);
     border-bottom: 3px solid var(--ui-color-text);
