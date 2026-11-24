@@ -24,7 +24,7 @@
     "@astrojs/check": "^0.9.12",
     "@playwright/test": "1.65.1",
     "@types/node": "^24.19.2",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "zod": "^4.6.7"
   }
 }
