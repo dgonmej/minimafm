@@ -55,3 +55,13 @@ cómo publicarla en un servidor propio.
 
 Hecha con [Astro](https://astro.build) y [dgonmej-ui](https://github.com/dgonmej/dgonmej-ui).
 Iconos de [Lucide](https://lucide.dev) (licencia ISC).
+
+## Al clonar el repositorio
+
+Activar el hook que comprueba, antes de cada push que cambie `package-lock.json`, que instala bien en Linux (necesita Docker):
+
+```bash
+git config core.hooksPath .githooks
+```
+
+También se puede lanzar a mano con `npm run comprobar-lock`.
