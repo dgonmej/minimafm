@@ -138,6 +138,12 @@ dgonmej-ui-spinner {
   --ui-radius-scale: 1.5;
 }
 
+/* El del reproductor va dentro de su shadow DOM, donde no llega la regla de arriba; las variables sí
+   llegan, y el reproductor solo usa esta para su spinner */
+dgonmej-ui-audio-player {
+  --ui-radius-scale: 1.5;
+}
+
 /* ---------- Base ---------- */
 *,
 *::before,
