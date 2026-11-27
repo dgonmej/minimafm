@@ -6,11 +6,11 @@ import Icon from './Icon.astro';
 const base = import.meta.env.BASE_URL;
 const links = [
   { href: `${base}`, label: 'Inicio', icon: 'house' },
-  { href: `${base}programas/`, label: 'Programas', icon: 'radio' },
-  { href: `${base}horarios/`, label: 'Horarios', icon: 'calendar' },
-  { href: `${base}eventos/`, label: 'Eventos', icon: 'star' },
-  { href: `${base}noticias/`, label: 'Noticias', icon: 'bell' },
-  { href: `${base}la-radio/`, label: 'La Radio', icon: 'radio' },
+  { href: `${base}programs/`, label: 'Programas', icon: 'radio' },
+  { href: `${base}schedule/`, label: 'Horarios', icon: 'calendar' },
+  { href: `${base}events/`, label: 'Eventos', icon: 'star' },
+  { href: `${base}news/`, label: 'Noticias', icon: 'bell' },
+  { href: `${base}about/`, label: 'La Radio', icon: 'radio' },
 ];
 const path = Astro.url.pathname;
 const isCurrent = (href: string) => (href === base ? path === base : path.startsWith(href));

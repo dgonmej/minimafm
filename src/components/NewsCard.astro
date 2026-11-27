@@ -1,7 +1,7 @@
 ---
 import type { Noticia } from '../lib/api';
 import { formatoFecha, iso } from '../lib/format';
-import Foto from './Foto.astro';
+import Foto from './Photo.astro';
 
 interface Props {
   noticia: Noticia;
@@ -12,7 +12,7 @@ interface Props {
 
 const { noticia, destacada = false, prioritaria = false } = Astro.props;
 const { titulo, fecha, categoria, resumen, autor, imagen } = noticia.data;
-const href = `${import.meta.env.BASE_URL}noticias/${noticia.id}/`;
+const href = `${import.meta.env.BASE_URL}news/${noticia.id}/`;
 ---
 
 <dgonmej-ui-card class:list={['news', { destacada }]} href={href} interactive padding={destacada ? 'spacious' : 'regular'}>

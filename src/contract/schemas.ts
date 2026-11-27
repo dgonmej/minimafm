@@ -1,10 +1,10 @@
-// Copia de minimafm-api/api/src/contrato: no se edita aquí, se actualiza con «npm run contrato» en minimafm-api.
+// Copia de minimafm-api/api/src/contract: no se edita aquí, se actualiza con «npm run contrato» en minimafm-api.
 /*
  * Cómo se valida lo que llega del panel para cada contenido y para la emisora (zod). Lo usa la API
- * (resources.ts) y de aquí salen los tipos del panel y de la web (tipos.ts). Parte del contrato (ver LEEME.md).
+ * (resources.ts) y de aquí salen los tipos del panel y de la web (types.ts). Parte del contrato (ver README.md).
  */
 import { z } from 'zod';
-import { categoriasEvento, categoriasNoticia, categoriasPrograma, iconosFormato, redesSociales } from './catalogos.ts';
+import { categoriasEvento, categoriasNoticia, categoriasPrograma, iconosFormato, redesSociales } from './catalogs.ts';
 
 const texto = (max: number) => z.string().trim().min(1, 'Este campo es obligatorio').max(max, `Máximo ${max} caracteres`);
 const fecha = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha con formato AAAA-MM-DD');

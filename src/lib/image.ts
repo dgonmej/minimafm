@@ -2,7 +2,7 @@
  * Imágenes subidas desde el panel. La API devuelve { id, alt, ancho, alto, anchos } y cada ancho
  * está en /media/{id}-{ancho}.webp (lo sirve nginx en el mismo dominio que la web).
  */
-import type { Imagen } from '../contrato/tipos';
+import type { Imagen } from '../contract/types';
 
 export type { Imagen };
 

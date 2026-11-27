@@ -1,6 +1,6 @@
 ---
 import { getImage } from 'astro:assets';
-import logo from '../assets/logo-cuadrado.png';
+import logo from '../assets/logo-square.png';
 import { getRadio } from '../lib/api';
 
 const radio = await getRadio();
@@ -27,7 +27,7 @@ const artwork = await getImage({ src: logo, width: 500, format: 'png' });
 
 <script>
   import { enAntena, parrilla } from '../lib/schedule';
-  import type { Ahora } from '../contrato/tipos';
+  import type { Ahora } from '../contract/types';
 
   // Debajo del nombre: el directo, la canción que suena o, si la emisión no responde, el programa de la parrilla
   const player = document.getElementById('player') as HTMLElement & { subheading: string };

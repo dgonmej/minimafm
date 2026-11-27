@@ -1,11 +1,11 @@
-// Copia de minimafm-api/api/src/contrato: no se edita aquí, se actualiza con «npm run contrato» en minimafm-api.
+// Copia de minimafm-api/api/src/contract: no se edita aquí, se actualiza con «npm run contrato» en minimafm-api.
 /*
- * Tipos de lo que se envía y se recibe de la API, sacados de los esquemas (esquemas.ts): si cambia un
- * campo en la API, el panel y la web dejan de compilar donde lo usan. Parte del contrato (ver LEEME.md).
+ * Tipos de lo que se envía y se recibe de la API, sacados de los esquemas (schemas.ts): si cambia un
+ * campo en la API, el panel y la web dejan de compilar donde lo usan. Parte del contrato (ver README.md).
  */
 import type { z } from 'zod';
-import type { ahoraSchema, cancionSchema, emisionSchema, esquemas, franja, listaSchema, modosLista, radioSchema } from './esquemas.ts';
-import type { RedSocial } from './catalogos.ts';
+import type { ahoraSchema, cancionSchema, emisionSchema, esquemas, franja, listaSchema, modosLista, radioSchema } from './schemas.ts';
+import type { RedSocial } from './catalogs.ts';
 
 export type Recurso = keyof typeof esquemas;
 

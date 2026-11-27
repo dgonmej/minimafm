@@ -31,7 +31,7 @@ async function desborde(page: Page) {
 let paginas: string[] = [];
 test.beforeAll(async ({ request }) => {
   const [programa, evento, noticia, legal] = await Promise.all(['programas', 'eventos', 'noticias', 'paginas'].map((t) => primero(request, t)));
-  paginas = ['/', '/programas/', `/programas/${programa}/`, '/horarios/', '/noticias/', `/noticias/${noticia}/`, '/eventos/', `/eventos/${evento}/`, '/la-radio/', '/anunciate/', `/legal/${legal}/`];
+  paginas = ['/', '/programs/', `/programs/${programa}/`, '/schedule/', '/news/', `/news/${noticia}/`, '/events/', `/events/${evento}/`, '/about/', '/advertise/', `/legal/${legal}/`];
 });
 
 for (const tema of TEMAS)

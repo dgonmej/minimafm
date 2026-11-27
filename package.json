@@ -10,7 +10,7 @@
     "preview": "astro preview",
     "test:e2e": "playwright test",
     "check": "astro check",
-    "comprobar-lock": "scripts/comprobar-lock.sh"
+    "comprobar-lock": "scripts/check-lock.sh"
   },
   "dependencies": {
     "@astrojs/node": "^11.1.11",

@@ -1,7 +1,7 @@
-// Copia de minimafm-api/api/src/contrato: no se edita aquí, se actualiza con «npm run contrato» en minimafm-api.
+// Copia de minimafm-api/api/src/contract: no se edita aquí, se actualiza con «npm run contrato» en minimafm-api.
 /*
  * Listas cerradas que comparten la API, el panel y la web: categorías, redes, iconos, roles…
- * Sin dependencias, para poder usarse también en el navegador. Parte del contrato (ver LEEME.md).
+ * Sin dependencias, para poder usarse también en el navegador. Parte del contrato (ver README.md).
  */
 
 export const roles = ['admin', 'editor'] as const;

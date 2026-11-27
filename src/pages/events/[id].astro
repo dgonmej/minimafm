@@ -3,7 +3,7 @@ import { getEvento } from '../../lib/api';
 import { renderMarkdown } from '../../lib/markdown';
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
-import Foto from '../../components/Foto.astro';
+import Foto from '../../components/Photo.astro';
 import { formatoFechaLarga, iconoEvento, iso } from '../../lib/format';
 
 const evento = await getEvento(Astro.params.id!);
@@ -15,7 +15,7 @@ const base = import.meta.env.BASE_URL;
 
 <Layout title={titulo} description={resumen} imagen={imagen}>
   <article class="container article">
-    <dgonmej-ui-button variant="ghost" size="small" href={`${base}eventos/`}>
+    <dgonmej-ui-button variant="ghost" size="small" href={`${base}events/`}>
       <dgonmej-ui-icon name="chevron-left" size="16"></dgonmej-ui-icon>Agenda
     </dgonmej-ui-button>
 

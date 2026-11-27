@@ -45,7 +45,7 @@ const tel = (n: string) => n.replace(/\s/g, '');
             <h2 id="today-title">Hoy en Mínima FM</h2>
             <p>La programación de hoy, en hora de Canarias.</p>
           </div>
-          <dgonmej-ui-button variant="secondary" href={`${base}horarios/`}>Toda la semana</dgonmej-ui-button>
+          <dgonmej-ui-button variant="secondary" href={`${base}schedule/`}>Toda la semana</dgonmej-ui-button>
         </div>
         <Schedule soloHoy />
       </div>
@@ -73,7 +73,7 @@ const tel = (n: string) => n.replace(/\s/g, '');
         <h2 id="programs-title">Nuestros programas</h2>
         <p>Información, tradición, deporte y mucha música, hechos en el Valle.</p>
       </div>
-      <dgonmej-ui-button variant="secondary" href={`${base}programas/`}>Todos los programas</dgonmej-ui-button>
+      <dgonmej-ui-button variant="secondary" href={`${base}programs/`}>Todos los programas</dgonmej-ui-button>
     </div>
     <ul class="grid-cards grid-4">
       {destacados.map((p) => <li><ProgramCard programa={p} /></li>)}
@@ -87,7 +87,7 @@ const tel = (n: string) => n.replace(/\s/g, '');
         <h2 id="events-title">Próximos eventos</h2>
         <p>Lo que se mueve en el Valle en las próximas semanas.</p>
       </div>
-      <dgonmej-ui-button variant="secondary" href={`${base}eventos/`}>Toda la agenda</dgonmej-ui-button>
+      <dgonmej-ui-button variant="secondary" href={`${base}events/`}>Toda la agenda</dgonmej-ui-button>
     </div>
     <ul class="grid-cards">
       {eventos.map((e) => <li><EventCard evento={e} /></li>)}
@@ -101,7 +101,7 @@ const tel = (n: string) => n.replace(/\s/g, '');
         <h2 id="news-title">Últimas noticias</h2>
         <p>La actualidad de la radio y del municipio.</p>
       </div>
-      <dgonmej-ui-button variant="secondary" href={`${base}noticias/`}>Todas las noticias</dgonmej-ui-button>
+      <dgonmej-ui-button variant="secondary" href={`${base}news/`}>Todas las noticias</dgonmej-ui-button>
     </div>
     <div class="news">
       {destacada && <NewsCard noticia={destacada} destacada prioritaria />}

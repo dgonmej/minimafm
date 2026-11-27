@@ -2,7 +2,7 @@
 import Icon from './Icon.astro';
 import { describirFranja, iconoPrograma } from '../lib/format';
 import type { Programa } from '../data/radio';
-import { urlImagen } from '../lib/imagen';
+import { urlImagen } from '../lib/image';
 
 interface Props {
   programa: Programa;
@@ -20,7 +20,7 @@ const { programa } = Astro.props;
     <Icon name={iconoPrograma[programa.categoria]} size={16} />
     {programa.categoria}
   </p>
-  <h3><a href={`${import.meta.env.BASE_URL}programas/${programa.id}/`}>{programa.nombre}</a></h3>
+  <h3><a href={`${import.meta.env.BASE_URL}programs/${programa.id}/`}>{programa.nombre}</a></h3>
   <p class="text">{programa.descripcion}</p>
   <ul slot="footer" class="slots">
     {
