@@ -11,7 +11,7 @@ const artwork = await getImage({ src: logo, width: 500, format: 'png' });
 
 <!--
   Reproductor fijo abajo. transition:persist lo mantiene vivo al navegar entre paginas,
-  asi que la radio no se corta. El subtitulo muestra el programa que suena ahora.
+  asi que la radio no se corta. El subtitulo muestra lo que suena ahora (/api/ahora).
 -->
 <div class="player-bar" transition:persist="player">
   <dgonmej-ui-audio-player
@@ -27,15 +27,35 @@ const artwork = await getImage({ src: logo, width: 500, format: 'png' });
 
 <script>
   import { enAntena, parrilla } from '../lib/schedule';
+  import type { Ahora } from '../contrato/tipos';
 
-  // Actualiza "Ahora: ..." en el reproductor cada minuto
+  // Debajo del nombre: el directo, la canción que suena o, si la emisión no responde, el programa de la parrilla
   const player = document.getElementById('player') as HTMLElement & { subheading: string };
-  const update = () => {
+  let ahora: Ahora | null = null;
+
+  const pintar = () => {
     const { actual, continuidad } = enAntena(parrilla());
-    player.subheading = `Ahora: ${actual ? actual.programa.nombre : continuidad.nombre}`;
+    const programa = actual ? actual.programa.nombre : continuidad.nombre;
+    if (ahora?.emitiendo && ahora.directo) player.subheading = `En directo: ${ahora.titulo ?? programa}`;
+    else if (ahora?.emitiendo && ahora.titulo) player.subheading = ahora.artista ? `Suena: ${ahora.titulo}, de ${ahora.artista}` : `Suena: ${ahora.titulo}`;
+    else player.subheading = `Ahora: ${programa}`;
   };
-  update();
-  setInterval(update, 60_000);
+
+  const consultar = async () => {
+    if (document.hidden) return;
+    try {
+      const res = await fetch('/api/ahora', { headers: { accept: 'application/json' } });
+      ahora = res.ok ? ((await res.json()) as Ahora) : null;
+    } catch {
+      ahora = null;
+    }
+    pintar();
+  };
+
+  pintar();
+  consultar();
+  setInterval(consultar, 20_000);
+  document.addEventListener('visibilitychange', consultar);
 </script>
 
 <style>

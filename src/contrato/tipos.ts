@@ -4,7 +4,7 @@
  * campo en la API, el panel y la web dejan de compilar donde lo usan. Parte del contrato (ver LEEME.md).
  */
 import type { z } from 'zod';
-import type { esquemas, franja, radioSchema } from './esquemas.ts';
+import type { ahoraSchema, esquemas, franja, radioSchema } from './esquemas.ts';
 import type { RedSocial } from './catalogos.ts';
 
 export type Recurso = keyof typeof esquemas;
@@ -31,6 +31,9 @@ export type Publico<R extends Recurso> = Omit<z.output<(typeof esquemas)[R]>, 'i
   creado: string;
   actualizado: string;
 } & (R extends ConImagen ? { imagen: Imagen | null } : unknown);
+
+/** Lo que devuelve /api/ahora */
+export type Ahora = z.output<typeof ahoraSchema>;
 
 /** Lo que devuelve /api/radio */
 export type Radio = z.output<typeof radioSchema>;

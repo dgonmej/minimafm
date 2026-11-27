@@ -105,6 +105,16 @@ export const esquemas = {
   }),
 };
 
+/** Lo que suena ahora en la emisión (/api/ahora) */
+export const ahoraSchema = z.object({
+  /** La emisión funciona: si es false, el resto no dice nada */
+  emitiendo: z.boolean(),
+  /** Hay un locutor conectado en directo */
+  directo: z.boolean(),
+  titulo: z.string().nullable(),
+  artista: z.string().nullable(),
+});
+
 /** Datos de la emisora (una sola fila) */
 export const radioSchema = z.object({
   nombre: texto(80),
