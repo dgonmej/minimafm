@@ -132,3 +132,35 @@ export const radioSchema = z.object({
     .max(12, 'Máximo 12 redes')
     .default([]),
 });
+
+// ---------- Emisión: biblioteca de música y listas (RAD-55) ----------
+
+/** Lo que se puede corregir de una canción ya subida */
+export const cancionSchema = z.object({
+  titulo: texto(200),
+  artista: z.string().trim().max(200, 'Máximo 200 caracteres').default(''),
+  activa: z.boolean().default(true),
+});
+
+export const modosLista = ['aleatoria', 'orden'] as const;
+
+/** Una lista: su nombre, si suena en orden o al azar, y sus canciones (ids) en orden */
+export const listaSchema = z.object({
+  nombre: texto(80),
+  modo: z.enum(modosLista, 'Elige un modo').default('aleatoria'),
+  canciones: z
+    .array(z.number().int().positive())
+    .max(2000, 'Máximo 2000 canciones por lista')
+    .refine((ids) => new Set(ids).size === ids.length, 'Hay canciones repetidas')
+    .default([]),
+});
+
+const idLista = z.number().int().positive().nullable().default(null);
+
+/** Qué suena: la lista del AutoDJ, la de cuñas (cada cuántas canciones) y la de reserva */
+export const emisionSchema = z.object({
+  listaId: idLista,
+  cunasListaId: idLista,
+  cunasCada: z.number().int().min(0, 'Mínimo 0 (sin cuñas)').max(20, 'Máximo 20').default(4),
+  reservaListaId: idLista,
+});

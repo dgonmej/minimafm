@@ -4,7 +4,7 @@
  * campo en la API, el panel y la web dejan de compilar donde lo usan. Parte del contrato (ver LEEME.md).
  */
 import type { z } from 'zod';
-import type { ahoraSchema, esquemas, franja, radioSchema } from './esquemas.ts';
+import type { ahoraSchema, cancionSchema, emisionSchema, esquemas, franja, listaSchema, modosLista, radioSchema } from './esquemas.ts';
 import type { RedSocial } from './catalogos.ts';
 
 export type Recurso = keyof typeof esquemas;
@@ -41,3 +41,29 @@ export type Radio = z.output<typeof radioSchema>;
 export type EntradaRadio = z.input<typeof radioSchema>;
 export type Red = { red: RedSocial; url: string };
 export type Franja = z.output<typeof franja>;
+
+// ---------- Emisión (RAD-55) ----------
+
+/** Una canción de la biblioteca, tal como la devuelve /api/admin/canciones */
+export type Cancion = z.output<typeof cancionSchema> & {
+  id: number;
+  /** Segundos */
+  duracion: number;
+  formato: string;
+  bytes: number;
+  creado: string;
+};
+
+export type ModoLista = (typeof modosLista)[number];
+export type EntradaLista = z.input<typeof listaSchema>;
+
+/** Para qué se usa una lista en la emisión */
+export type UsoLista = 'autodj' | 'cunas' | 'reserva';
+
+/** Una lista en el listado de /api/admin/listas */
+export type ResumenLista = { id: number; nombre: string; modo: ModoLista; canciones: number; duracion: number; usos: UsoLista[] };
+
+/** Una lista con sus canciones (ids en orden), en /api/admin/listas/{id} */
+export type Lista = z.output<typeof listaSchema> & { id: number };
+
+export type Emision = z.output<typeof emisionSchema>;
