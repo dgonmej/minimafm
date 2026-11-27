@@ -1,7 +1,7 @@
 ---
 import type { Evento } from '../lib/api';
 import Icon from './Icon.astro';
-import Foto from './Foto.astro';
+import Foto from './Photo.astro';
 import { iconoEvento, partesFecha, formatoFechaLarga, iso } from '../lib/format';
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 const { evento } = Astro.props;
 const { titulo, fecha, hora, lugar, categoria, resumen, imagen } = evento.data;
 const { dia, mes } = partesFecha(fecha);
-const href = `${import.meta.env.BASE_URL}eventos/${evento.id}/`;
+const href = `${import.meta.env.BASE_URL}events/${evento.id}/`;
 ---
 
 <dgonmej-ui-card class="event" href={href} interactive>

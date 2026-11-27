@@ -6,7 +6,7 @@
 import Icon from './Icon.astro';
 import { describirFranja, iconoPrograma, tonoPrograma } from '../lib/format';
 import type { Programa } from '../data/radio';
-import Foto from './Foto.astro';
+import Foto from './Photo.astro';
 
 interface Props {
   programa: Programa;
@@ -14,7 +14,7 @@ interface Props {
 
 const { programa } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const ficha = `${base}programas/${programa.id}/`;
+const ficha = `${base}programs/${programa.id}/`;
 ---
 
 <dgonmej-ui-card class="feature" id={programa.id} layout="horizontal" data-program={programa.id}>

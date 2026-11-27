@@ -1,4 +1,4 @@
-// Feed RSS de noticias (/noticias/rss.xml): las 30 más recientes, para lectores de feeds y agregadores
+// Feed RSS de noticias (/news/rss.xml): las 30 más recientes, para lectores de feeds y agregadores
 import { getNoticias, getRadio } from '../../lib/api';
 
 const escapar = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[c]!);
@@ -6,10 +6,10 @@ const escapar = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<'
 export async function GET({ site }: { site: URL }) {
   const [noticias, radio] = await Promise.all([getNoticias(), getRadio()]);
   const recientes = noticias.sort((a, b) => b.data.fecha.getTime() - a.data.fecha.getTime()).slice(0, 30);
-  const web = new URL('/noticias/', site).href;
+  const web = new URL('/news/', site).href;
   const items = recientes
     .map((n) => {
-      const url = new URL(`/noticias/${n.id}/`, site).href;
+      const url = new URL(`/news/${n.id}/`, site).href;
       return `    <item>
       <title>${escapar(n.data.titulo)}</title>
       <link>${url}</link>
@@ -28,7 +28,7 @@ export async function GET({ site }: { site: URL }) {
     <link>${web}</link>
     <description>${escapar(`Las noticias de ${radio.nombre} y de la actualidad del ${radio.zona}.`)}</description>
     <language>es-ES</language>
-    <atom:link href="${new URL('/noticias/rss.xml', site).href}" rel="self" type="application/rss+xml" />
+    <atom:link href="${new URL('/news/rss.xml', site).href}" rel="self" type="application/rss+xml" />
 ${recientes[0] ? `    <lastBuildDate>${recientes[0].data.fecha.toUTCString()}</lastBuildDate>\n` : ''}${items}
   </channel>
 </rss>

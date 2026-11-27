@@ -8,7 +8,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import PlayerBar from '../components/PlayerBar.astro';
 import { getProgramas, getRadio } from '../lib/api';
-import { altoPara, urlImagen, type Imagen } from '../lib/imagen';
+import { altoPara, urlImagen, type Imagen } from '../lib/image';
 
 interface Props {
   title?: string;
@@ -62,7 +62,7 @@ const jsonLd = {
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <link rel="alternate" type="application/rss+xml" title={`Noticias de ${radio.nombre}`} href={new URL(`${base}/noticias/rss.xml`, Astro.site).href} />
+    <link rel="alternate" type="application/rss+xml" title={`Noticias de ${radio.nombre}`} href={new URL(`${base}/news/rss.xml`, Astro.site).href} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />

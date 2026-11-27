@@ -1,5 +1,5 @@
 ---
-import { urlImagen } from '../../lib/imagen';
+import { urlImagen } from '../../lib/image';
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
 import { getEquipo, getHistoria, getProgramas, getRadio } from '../../lib/api';
@@ -84,7 +84,7 @@ const tel = (n: string) => n.replace(/\s/g, '');
             <span>
               {p.programas.map((pr, i) => (
                 <>
-                  <a href={`${base}programas/${pr.id}/`}>{pr.nombre}</a>
+                  <a href={`${base}programs/${pr.id}/`}>{pr.nombre}</a>
                   {i < p.programas.length - 1 ? ' y ' : ''}
                 </>
               ))}

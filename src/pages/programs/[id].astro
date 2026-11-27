@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
-import Foto from '../../components/Foto.astro';
+import Foto from '../../components/Photo.astro';
 import { dias } from '../../data/radio';
 import { getProgramas, getRadio } from '../../lib/api';
 import { describirFranja, iconoPrograma, tonoPrograma } from '../../lib/format';
@@ -24,7 +24,7 @@ const mismoTipo = programas.filter((p) => p.categoria === programa.categoria && 
   <header class:list={['band', tonoPrograma[programa.categoria]]}>
     <div class:list={['container band-inner', { 'con-foto': programa.imagen }]}>
       <div class="band-texto">
-      <a class="back" href={`${base}programas/`}>
+      <a class="back" href={`${base}programs/`}>
         <dgonmej-ui-icon name="chevron-left" size="16"></dgonmej-ui-icon>Programas
       </a>
       <p class="category">
@@ -103,7 +103,7 @@ const mismoTipo = programas.filter((p) => p.categoria === programa.categoria && 
         }
       </ul>
       <p class="next" data-next hidden></p>
-      <dgonmej-ui-button variant="secondary" size="small" href={`${base}horarios/`}>
+      <dgonmej-ui-button variant="secondary" size="small" href={`${base}schedule/`}>
         Ver la parrilla completa
       </dgonmej-ui-button>
     </aside>
@@ -116,7 +116,7 @@ const mismoTipo = programas.filter((p) => p.categoria === programa.categoria && 
           Más de {programa.categoria.toLowerCase()}:{' '}
           {mismoTipo.map((p, i) => (
             <>
-              <a href={`${base}programas/${p.id}/`}>{p.nombre}</a>
+              <a href={`${base}programs/${p.id}/`}>{p.nombre}</a>
               {i < mismoTipo.length - 2 ? ', ' : i === mismoTipo.length - 2 ? ' y ' : ''}
             </>
           ))}
@@ -124,11 +124,11 @@ const mismoTipo = programas.filter((p) => p.categoria === programa.categoria && 
       )
     }
     <div class="pager">
-      <a href={`${base}programas/${anterior.id}/`} class="prev">
+      <a href={`${base}programs/${anterior.id}/`} class="prev">
         <span>Anterior</span>
         <strong>{anterior.nombre}</strong>
       </a>
-      <a href={`${base}programas/${siguiente.id}/`} class="next-link">
+      <a href={`${base}programs/${siguiente.id}/`} class="next-link">
         <span>Siguiente</span>
         <strong>{siguiente.nombre}</strong>
       </a>

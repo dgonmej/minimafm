@@ -3,7 +3,7 @@ import { getNoticia } from '../../lib/api';
 import { renderMarkdown } from '../../lib/markdown';
 import Layout from '../../layouts/Layout.astro';
 import { formatoFechaLarga, iso } from '../../lib/format';
-import Foto from '../../components/Foto.astro';
+import Foto from '../../components/Photo.astro';
 
 const noticia = await getNoticia(Astro.params.id!);
 if (!noticia) return Astro.rewrite('/404/');
@@ -14,7 +14,7 @@ const base = import.meta.env.BASE_URL;
 
 <Layout title={titulo} description={resumen} imagen={imagen}>
   <article class="container article">
-    <dgonmej-ui-button variant="ghost" size="small" href={`${base}noticias/`}>
+    <dgonmej-ui-button variant="ghost" size="small" href={`${base}news/`}>
       <dgonmej-ui-icon name="chevron-left" size="16"></dgonmej-ui-icon>Noticias
     </dgonmej-ui-button>
 

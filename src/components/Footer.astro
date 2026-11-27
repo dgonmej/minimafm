@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import logoClaro from '../assets/logo-horizontal.png';
 import logoOscuro from '../assets/logo-horizontal-oscuro.png';
 import Icon from './Icon.astro';
-import RedIcon from './RedIcon.astro';
+import RedIcon from './SocialIcon.astro';
 import { getRadio } from '../lib/api';
 
 const radio = await getRadio();
@@ -26,12 +26,12 @@ const tel = (n: string) => n.replace(/\s/g, '');
     <nav aria-label="Secciones del pie">
       <h2>La Radio</h2>
       <ul>
-        <li><a href={`${base}programas/`}>Programas</a></li>
-        <li><a href={`${base}horarios/`}>Horarios</a></li>
-        <li><a href={`${base}eventos/`}>Agenda de eventos</a></li>
-        <li><a href={`${base}noticias/`}>Noticias</a></li>
-        <li><a href={`${base}la-radio/`}>Quiénes somos</a></li>
-        <li><a href={`${base}anunciate/`}>Anúnciate</a></li>
+        <li><a href={`${base}programs/`}>Programas</a></li>
+        <li><a href={`${base}schedule/`}>Horarios</a></li>
+        <li><a href={`${base}events/`}>Agenda de eventos</a></li>
+        <li><a href={`${base}news/`}>Noticias</a></li>
+        <li><a href={`${base}about/`}>Quiénes somos</a></li>
+        <li><a href={`${base}advertise/`}>Anúnciate</a></li>
       </ul>
     </nav>
 

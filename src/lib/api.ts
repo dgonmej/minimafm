@@ -6,8 +6,8 @@
  * contenido de Astro ({ id, data, cuerpo }), asi las plantillas apenas cambian.
  */
 import type { Programa } from '../data/radio';
-import { nombresRedes, type RedSocial } from '../contrato/catalogos';
-import type { Publico, Radio as RadioApiActual } from '../contrato/tipos';
+import { nombresRedes, type RedSocial } from '../contract/catalogs';
+import type { Publico, Radio as RadioApiActual } from '../contract/types';
 
 const API_URL = (process.env.API_URL ?? import.meta.env.API_URL ?? 'http://localhost:3000').replace(/\/$/, '');
 const TTL = 15_000;
@@ -70,7 +70,7 @@ const fecha = (s: string) => new Date(`${s}T00:00:00Z`);
 
 type Entry<D> = { id: string; data: D; cuerpo: string };
 
-/** Lo que la web usa de cada contenido: los campos de la API (ver src/contrato) con las fechas como Date */
+/** Lo que la web usa de cada contenido: los campos de la API (ver src/contract) con las fechas como Date */
 type Datos<R extends 'eventos' | 'noticias'> = Omit<Publico<R>, 'id' | 'cuerpo' | 'fecha'> & { fecha: Date };
 
 export type Evento = Entry<Datos<'eventos'>>;
